@@ -22,6 +22,9 @@ function Entity:new(area, x, y, opts)
     self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
 
     self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y, self.sprite.w, self.sprite.h, Texture_IMG)
+   
+    self.collider = world:newRectangleCollider(self.x, self.y, self.sprite.w, self.sprite.h)
+    self.collider:setFixedRotation(true)
 end
 
 function Entity:update(dt)

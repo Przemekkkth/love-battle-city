@@ -1,6 +1,10 @@
 GameScreen = Object:extend()
 
 function GameScreen:new()
+    world = wf.newWorld(0, 0, true)
+    self:initCollisionClass() 
+    self:initBoundary()
+
     self.area = Area(self)
     self.player = self.area:addGameObject('Player', 128, 384, {type = SpriteType.ST_PLAYER_1})
     self.players = {}
@@ -34,6 +38,7 @@ function GameScreen:update(dt)
     self:checkCollisionPlayerBulletsWithEnemyBullets()
     self:checkCollisionBulletsWithTanks()
     self.area:update(dt)
+    world:update(dt)
 end
 
 function GameScreen:draw()
@@ -51,6 +56,7 @@ function GameScreen:draw()
         love.graphics.print('Game Over', SCREEN_WIDTH / 2, self.yGameOverText, 0, 1, 1, love.graphics.getFont():getWidth('Game Over') / 2 )
         love.graphics.setColor(1, 1, 1)
     end
+    world:draw()
 end
 
 function GameScreen:loadLevel(path)
@@ -320,3 +326,19 @@ function GameScreen:drawStatisticsRect()
     love.graphics.setColor(1, 1, 1)
 end
 
+function GameScreen:initCollisionClass()
+    world:addCollisionClass('Boundary')
+    world:addCollisionClass('Brick')
+end
+
+function GameScreen:initBoundary()
+    self.topBoundary = world:newRectangleCollider(0, -1, SCREEN_WIDTH, 1)
+    self.topBoundary:setType('static')
+    self.topBoundary:setCollisionClass('Boundary')
+    self.leftBoundary = world:newRectangleCollider(-1, 0, 1, SCREEN_HEIGHT)
+    self.leftBoundary:setType('static')
+    self.bottomBoundary = world:newRectangleCollider(0, SCREEN_HEIGHT, SCREEN_WIDTH, 1)
+    self.bottomBoundary:setType('static')
+    self.rightBoundary = world:newRectangleCollider(StatusRect.x, 0, 1, SCREEN_HEIGHT)
+    self.rightBoundary:setType('static')
+end

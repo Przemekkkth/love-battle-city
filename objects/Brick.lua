@@ -5,6 +5,8 @@ function Brick:new(area, x, y, opts)
     
     self.collisionCount = 0
     self.stateCode = 0
+    self.collider:setType('static')
+    self.collider:setRestitution(0.2)
 end
 
 function Brick:bulletHit(_bulletDirection)

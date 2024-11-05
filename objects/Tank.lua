@@ -16,6 +16,11 @@ function Tank:new(area, x, y, opts)
     self.stop = false
     self.level = 0
     self.bullets = {}
+    self.collider:destroy()
+    self.tankWidth = self.sprite.w - 6
+    self.tankHeight = self.sprite.h - 6
+    self.collider = world:newRectangleCollider(self.x, self.y, self.tankWidth, self.tankHeight)
+    self.collider:setFixedRotation(true)
     self:clearFlag(TankStateFlag.TSF_LIFE)
 
     
@@ -72,13 +77,15 @@ function Tank:update(dt)
     if self:testFlag(TankStateFlag.TSF_LIFE) then
         if not self.stop and not self:testFlag(TankStateFlag.TSF_FROZEN) then
             if self.direction == Direction.D_UP then
-                self.y = self.y - self.speed * dt
+                --self.y = self.y - self.speed * dt
+                self.collider:setLinearVelocity(0, -self.speed)
             elseif self.direction == Direction.D_LEFT then
-                self.x = self.x - self.speed * dt
+                --self.x = self.x - self.speed * dt
+                self.collider:setLinearVelocity(-self.speed, 0)
             elseif self.direction == Direction.D_RIGHT then
-                self.x = self.x + self.speed * dt
+                self.collider:setLinearVelocity(self.speed, 0)
             elseif self.direction == Direction.D_DOWN then
-                self.y = self.y + self.speed * dt
+                self.collider:setLinearVelocity(0, self.speed)
            end
 
            if self.speed > 0 then
@@ -94,7 +101,12 @@ function Tank:update(dt)
 end
 
 function Tank:draw()
-    self.animation:draw(Texture_IMG, self.x, self.y)
+    local tankX, tankY = self.collider:getPosition()
+    if self:testFlag(TankStateFlag.TSF_MENU) or self:testFlag(TankStateFlag.TSF_CREATE) or self.isMenu then
+        self.animation:draw(Texture_IMG, self.x, self.y)
+    elseif self:testFlag(TankStateFlag.TSF_LIFE) then 
+        self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
+    end
 end
 
 function Tank:clearFlag(flag)
@@ -292,6 +304,13 @@ function Tank:clampX()
     elseif self.x + tankSize >= SCREEN_WIDTH - StatusRect.w then
         self.x = SCREEN_WIDTH - StatusRect.w - tankSize
     end
+
+    local tankX, tankY = self.collider:getPosition()
+    if tankX < 0 and not self.stop then 
+        local tankVX, tankVY = self.collider:getLinearVelocity()
+        self.collider:setLinearVelocity(0, tankVY)
+        self.stop = true
+    end
 end
 
 function Tank:clampY()
@@ -301,6 +320,10 @@ function Tank:clampY()
     elseif self.y + tankSize >= SCREEN_HEIGHT then
         self.y = SCREEN_HEIGHT - tankSize
     end
+
+    --local tankX, tankY = self.collider:getPosition()
+    
+
 end
 
 function Tank:clamp()

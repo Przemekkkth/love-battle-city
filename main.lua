@@ -2,7 +2,8 @@ Object = require 'libraries/Classic'
 Input  = require 'libraries/Input'
 Timer  = require 'libraries/Timer'
 Anim8  = require 'libraries/Anim8'
-
+wf = require 'libraries/windfield'
+world = wf.newWorld(0, 0, true) 
 require 'types'
 require 'Spritesheet'
 require 'Entity'

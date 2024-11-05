@@ -3,8 +3,9 @@ MenuScreen = Object:extend()
 function MenuScreen:new()
     self.logoImg = love.graphics.newQuad(0, 260, 406, 72, Texture_IMG)
     self.area = Area(self)
-    self.tankPointer = self.area:addGameObject('Player', 0, 0, {type = SpriteType.ST_PLAYER_1})
+    self.tankPointer = self.area:addGameObject('Player', 0, 0, {type = SpriteType.ST_PLAYER_1, isMenu = true})
     self.tankPointer.pointer = true
+    self.tankPointer:clearFlag(TankStateFlag.TSF_LIFE)
     self.tankPointer:setPos(144, 144)
     self.currentIndex = 0
 end
