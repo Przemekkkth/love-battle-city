@@ -7,6 +7,11 @@ function Bullet:new(area, x, y, opts)
     self.increasedDamage = false
     self.collide = false
     self.animation = self.upAnimation
+    if self.collisionClass == 'PlayerBullet' then
+        self.collider:setCollisionClass('PlayerBullet')
+    else
+        self.collider:setCollisionClass('PlayerBullet')
+    end
 
     if self.direction == Direction.D_UP then
         self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y, self.sprite.w, self.sprite.h, Texture_IMG)
@@ -21,24 +26,22 @@ end
 
 function Bullet:update(dt)
     if not self.collide then
+        local bulletSize = 8
+        local x, y = self.collider:getPosition()
+        self.x = x - bulletSize / 2
+        self.y = y - bulletSize / 2
+
         if self.direction == Direction.D_UP then
-            self.y = self.y - (self.speed * dt)
+            self.collider:setLinearVelocity(0, -self.speed)
         elseif self.direction == Direction.D_RIGHT then
-            self.x = self.x + (self.speed * dt)
+            self.collider:setLinearVelocity(self.speed, 0)
         elseif self.direction == Direction.D_DOWN then
-            self.y = self.y + (self.speed * dt)
+            self.collider:setLinearVelocity(0, self.speed)
         elseif self.direction == Direction.D_LEFT then
-            self.x = self.x - (self.speed * dt)
+            self.collider:setLinearVelocity(-self.speed, 0)
         end
 
-        local bulletSize = 8
-        if self.y <= 0 then
-            self:destroy()
-        elseif self.x <= 0 then
-            self:destroy()
-        elseif self.y >= SCREEN_HEIGHT - bulletSize then
-            self:destroy()
-        elseif self.x >= SCREEN_WIDTH - StatusRect.w - bulletSize then
+        if self.collider:enter('Boundary') then
             self:destroy()
         end
     else
@@ -60,6 +63,7 @@ function Bullet:destroy()
         return
     end
 
+    self.collider:destroy()
     self.collide = true
     self.speed = 0
     self.sprite = spriteData[SpriteType.ST_DESTROY_BULLET][1]
@@ -105,4 +109,9 @@ function Bullet:setDirection(_direction)
         self.direction = _direction
         self.animation = self.leftAnimation
     end
+end
+
+function Bullet:setPos(x, y)
+    Bullet.super.setPos(self, x, y)
+    self.collider:setPosition(x, y)
 end

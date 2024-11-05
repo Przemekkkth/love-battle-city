@@ -105,7 +105,7 @@ function Tank:draw()
     if self:testFlag(TankStateFlag.TSF_MENU) or self:testFlag(TankStateFlag.TSF_CREATE) or self.isMenu then
         self.animation:draw(Texture_IMG, self.x, self.y)
     elseif self:testFlag(TankStateFlag.TSF_LIFE) then 
-        self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
+        --self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
     end
 end
 
@@ -233,17 +233,19 @@ function Tank:fire()
 
     if #self.bullets < self.bulletMaxSize then
         local tankDir = (self:testFlag(TankStateFlag.TSF_ON_ICE) and self.new_direction or self.direction)
-        local bullet = self.area:addGameObject('Bullet', self.x, self.y, {direction = tankDir, type = SpriteType.ST_BULLET})
+        local xPos, yPos = self.collider:getPosition()
+
+        local bullet = nil --self.area:addGameObject('Bullet', xPos, yPos, {direction = tankDir, type = SpriteType.ST_BULLET})
         local tankSize = 32 -- px
         local bulletSize = 8
         if tankDir == Direction.D_UP then
-            bullet:setPos(bullet.x + tankSize / 2 - bulletSize / 2, bullet.y)
+            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos - tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
         elseif tankDir == Direction.D_RIGHT then
-            bullet:setPos(bullet.x + tankSize - bulletSize / 2, bullet.y + tankSize / 2 - bulletSize / 2)
+            bullet = self.area:addGameObject('Bullet', xPos + tankSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
         elseif tankDir == Direction.D_DOWN then
-            bullet:setPos(bullet.x + tankSize / 2 - bulletSize / 2, bullet.y + tankSize - bulletSize / 2)
+            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos + tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
         elseif tankDir == Direction.D_LEFT then
-            bullet:setPos(bullet.x, bullet.y + tankSize / 2 - bulletSize / 2)
+            bullet = self.area:addGameObject('Bullet', xPos - tankSize / 2 - bulletSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
         end
         table.insert(self.bullets, bullet)
     end

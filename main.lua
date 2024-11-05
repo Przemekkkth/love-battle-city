@@ -22,7 +22,7 @@ function love.load()
     timer = Timer()
     audio = {}
     audio.startSFX = love.audio.newSource('assets/sfx/startLevel.wav', 'static')
-    audio.startSFX:setVolume(0.5)
+    audio.startSFX:setVolume(0.0)
 
     input:bind('left', 'left_arrow')
     input:bind('right', 'right_arrow')

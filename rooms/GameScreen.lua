@@ -329,16 +329,26 @@ end
 function GameScreen:initCollisionClass()
     world:addCollisionClass('Boundary')
     world:addCollisionClass('Brick')
+    world:addCollisionClass('PlayerBullet')
+    world:addCollisionClass('EnemyBullet')
+    world:addCollisionClass('Eagle')
+    world:addCollisionClass('Player', {ignores = {'PlayerBullet'}})
 end
 
 function GameScreen:initBoundary()
     self.topBoundary = world:newRectangleCollider(0, -1, SCREEN_WIDTH, 1)
     self.topBoundary:setType('static')
     self.topBoundary:setCollisionClass('Boundary')
+
     self.leftBoundary = world:newRectangleCollider(-1, 0, 1, SCREEN_HEIGHT)
     self.leftBoundary:setType('static')
+    self.leftBoundary:setCollisionClass('Boundary')
+
     self.bottomBoundary = world:newRectangleCollider(0, SCREEN_HEIGHT, SCREEN_WIDTH, 1)
     self.bottomBoundary:setType('static')
+    self.bottomBoundary:setCollisionClass('Boundary')
+
     self.rightBoundary = world:newRectangleCollider(StatusRect.x, 0, 1, SCREEN_HEIGHT)
     self.rightBoundary:setType('static')
+    self.rightBoundary:setCollisionClass('Boundary')
 end

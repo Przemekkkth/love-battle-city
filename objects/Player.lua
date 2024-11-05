@@ -8,6 +8,9 @@ function Player:new(area, x, y, opts)
     self.score = 0
     self.shield = nil -- Entity(area, x, y, {type = SpriteType.ST_PLAYER_1} )
     self.pointer = false
+    if self.isMenu == nil then 
+        self.collider:setCollisionClass('Player')
+    end
 end
 
 function Player:update(dt)
