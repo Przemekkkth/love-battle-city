@@ -105,7 +105,7 @@ function Tank:draw()
     if self:testFlag(TankStateFlag.TSF_MENU) or self:testFlag(TankStateFlag.TSF_CREATE) or self.isMenu then
         self.animation:draw(Texture_IMG, self.x, self.y)
     elseif self:testFlag(TankStateFlag.TSF_LIFE) then 
-        --self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
+        self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
     end
 end
 

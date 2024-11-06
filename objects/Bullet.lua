@@ -44,6 +44,15 @@ function Bullet:update(dt)
         if self.collider:enter('Boundary') then
             self:destroy()
         end
+
+        if self.collider:enter('Brick') then
+            local brickCollider = self.collider:getEnterCollisionData('Brick').collider
+            local brickObject   = brickCollider:getObject()
+            if brickObject then
+                brickObject:bulletHit(self.direction)
+                self:destroy()
+            end
+        end
     else
         self.animation:update(dt)
     end

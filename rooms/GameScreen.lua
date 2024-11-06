@@ -32,8 +32,8 @@ function GameScreen:new()
 end
 
 function GameScreen:update(dt)
-    self:checkCollisionPlayerWithStaticBodies(dt)
-    self:checkCollisionBulletsWithStaticBodies()
+    --self:checkCollisionPlayerWithStaticBodies(dt)
+    --self:checkCollisionBulletsWithStaticBodies()
     self:checkPlayersWithTanks(dt)
     self:checkCollisionPlayerBulletsWithEnemyBullets()
     self:checkCollisionBulletsWithTanks()
@@ -87,15 +87,6 @@ function GameScreen:loadLevel(path)
             elseif char == "-" then
                 self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_ICE})
             end
-        end
-    end
-end
-
-function GameScreen:checkCollisionPlayerWithStaticBodies(dt)
-    for k, v in ipairs(staticBodies) do
-        self.player:collide(v, dt)
-        for _, tank in ipairs(self.tanks) do
-            tank:collide(v, dt)
         end
     end
 end

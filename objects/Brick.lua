@@ -6,7 +6,9 @@ function Brick:new(area, x, y, opts)
     self.collisionCount = 0
     self.stateCode = 0
     self.collider:setType('static')
-    self.collider:setRestitution(0.2)
+    self.collider:setRestitution(0.2) 
+    self.collider:setCollisionClass('Brick')
+    self.collider:setObject(self)
 end
 
 function Brick:bulletHit(_bulletDirection)
@@ -26,58 +28,49 @@ function Brick:bulletHit(_bulletDirection)
         self.toErase = true
     end
 
+    self.collider:destroy()
     if self.stateCode == 1 then
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w
-        self.collisionRect.h = self.sprite.h / 2
+        self.collider = world:newRectangleCollider(self.x, self.y, self.sprite.w, self.sprite.h / 2)
     elseif self.stateCode == 2 then
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h
+        self.collider = world:newRectangleCollider(self.x + self.sprite.w / 2, self.y, self.sprite.w / 2, self.sprite.h)
     elseif self.stateCode == 3 then
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w
-        self.collisionRect.h = self.sprite.h / 2
+        self.collider = world:newRectangleCollider(self.x, self.y + self.sprite.h / 2, self.sprite.w, self.sprite.h / 2)
     elseif self.stateCode == 4 then
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h
+        self.collider = world:newRectangleCollider(self.x, self.y, self.sprite.w / 2, self.sprite.h)
     elseif self.stateCode == 5 then
-        self.x = self.x + self.sprite.w / 2
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h / 2
+        self.collider = world:newRectangleCollider(self.x + self.sprite.w / 2, self.y, self.sprite.w / 2, self.sprite.h / 2)
     elseif self.stateCode == 6 then
-        self.x = self.x + self.sprite.w / 2
-        self.y = self.y + self.sprite.h / 2
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h / 2
+        self.collider = world:newRectangleCollider(self.x + self.sprite.w / 2, self.y + self.sprite.h / 2, self.sprite.w / 2, self.sprite.h / 2)
     elseif self.stateCode == 7 then
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h / 2
+        self.collider = world:newRectangleCollider(self.x, self.y, self.sprite.w / 2, self.sprite.h / 2)
     elseif self.stateCode == 8 then
-        self.y = self.y + self.sprite.h / 2
-        self.collisionRect.x = self.x
-        self.collisionRect.y = self.y
-        self.collisionRect.w = self.sprite.w / 2
-        self.collisionRect.h = self.sprite.h / 2
-    elseif self.stateCode == 9 then
-        self.x = -10
-        self.y = -10
-        self.collisionRect.w = 0
-        self.collisionRect.h = 0
+        self.collider = world:newRectangleCollider(self.x, self.y + self.sprite.h / 2, self.sprite.w / 2, self.sprite.h / 2)
     end
 
-    if self.stateCode >= 1 and self.stateCode <= 9 then
+    if self.stateCode >= 1 and self.stateCode <= 8 then
+        self.collider:setType('static')
+        self.collider:setRestitution(0.2)
+        self.collider:setCollisionClass('Brick')
+        self.collider:setObject(self)
+    end
+
+    local smallBrickSize = 8 --smallest brick size
+    if self.stateCode == 5 then
+        self.quad = love.graphics.newQuad(self.sprite.x + 8, self.sprite.y + self.stateCode * self.sprite.h, smallBrickSize, smallBrickSize, Texture_IMG)
+        local xPos, yPos = self.collider:getPosition()
+        self.x = xPos - smallBrickSize / 2
+        self.y = yPos - smallBrickSize / 2
+    elseif self.stateCode == 6 then
+        self.quad = love.graphics.newQuad(self.sprite.x + 8, self.sprite.y + self.stateCode * self.sprite.h + 8, smallBrickSize, smallBrickSize, Texture_IMG)
+        local xPos, yPos = self.collider:getPosition()
+        self.x = xPos - smallBrickSize / 2
+        self.y = yPos - smallBrickSize / 2
+    elseif self.stateCode == 8 then
+        self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y + self.stateCode * self.sprite.h + 8, smallBrickSize, smallBrickSize, Texture_IMG)
+        local xPos, yPos = self.collider:getPosition()
+        self.x = xPos - smallBrickSize / 2
+        self.y = yPos - smallBrickSize / 2
+    elseif self.stateCode >= 1 and self.stateCode <= 9 then
         self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y + self.stateCode * self.sprite.h, self.sprite.w, self.sprite.h, Texture_IMG)
     end
 end
