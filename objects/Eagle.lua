@@ -2,6 +2,8 @@ Eagle = Entity:extend()
 
 function Eagle:new(area, x, y, opts)
     Eagle.super.new(self, area, x, y, opts)
+    self.collider:setCollisionClass('Eagle')
+    self.collider:setType('static')
 end
 
 function Eagle:update(dt)
@@ -29,8 +31,9 @@ function Eagle:destroy()
     self.sprite = spriteData[SpriteType.ST_DESTROY_EAGLE][1]
 
     self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
+    
     local x = self.sprite.x / self.sprite.w + 1
-    self.animation = Anim8.newAnimation( self.grid(x, '1-7'), self.sprite.frameDuration, 'pauseAtEnd')
+    self.animation = Anim8.newAnimation( self.grid(math.floor(19), '1-7'), self.sprite.frameDuration, 'pauseAtEnd')
     local eagleSize = 32
     self.x = self.x - eagleSize / 2
     self.y = self.y - eagleSize / 2

@@ -14,7 +14,7 @@ function Enemy:new(area, x, y, opts)
     self.fireTime = 0
     self.reloadTime = 1
     self.livesCount = 1
-    self.bulletMaxSize = 1
+    self.bulletMaxSize = 2
     self.frozenTime = 0
     self.timer = Timer()
     self.collider:setCollisionClass('Enemy')
@@ -56,6 +56,7 @@ function Enemy:update(dt)
     if self:testFlag(TankStateFlag.TSF_FROZEN) then
         return
     end
+
     self.timer:update(dt)
 end
 
@@ -129,9 +130,9 @@ function Enemy:tryToShoot()
         local dx = self.targetPosition.x - (self.x + tankSize / 2)
         local dy = self.targetPosition.y - (self.y + tankSize / 2)
 
-        if self.stop then
-            self:fire()
-        else
+        self:fire()
+            
+        if math.random() < 0.5 then
             if self.direction == Direction.D_UP then
                 if dy < 0 and math.abs(dx) < tankSize then
                     self:fire()

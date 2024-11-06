@@ -10,6 +10,7 @@ function Player:new(area, x, y, opts)
     self.pointer = false
     if self.isMenu == nil then 
         self.collider:setCollisionClass('Player')
+        self.collider:setObject(self)
     end
 end
 

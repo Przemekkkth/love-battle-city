@@ -17,6 +17,7 @@ function Tank:new(area, x, y, opts)
     self.level = 0
     self.bullets = {}
     self.collider:destroy()
+    self.bulletMaxSize = 2
     self.tankWidth = self.sprite.w - 6
     self.tankHeight = self.sprite.h - 6
     self.collider = world:newRectangleCollider(self.x, self.y, self.tankWidth, self.tankHeight)

@@ -25,6 +25,10 @@ function Entity:new(area, x, y, opts)
    
     self.collider = world:newRectangleCollider(self.x, self.y, self.sprite.w, self.sprite.h)
     self.collider:setFixedRotation(true)
+    if self.type == SpriteType.ST_STONE_WALL then
+        self.collider:setType('static')
+        self.collider:setCollisionClass('StoneWall')
+    end
 end
 
 function Entity:update(dt)

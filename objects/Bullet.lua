@@ -67,6 +67,10 @@ function Bullet:update(dt)
                 end
             end
         end
+
+        if self.collider:enter('StoneWall') then
+            self:destroy()
+        end
     else
         self.animation:update(dt)
     end
