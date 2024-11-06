@@ -10,8 +10,9 @@ function Bullet:new(area, x, y, opts)
     if self.collisionClass == 'PlayerBullet' then
         self.collider:setCollisionClass('PlayerBullet')
     else
-        self.collider:setCollisionClass('PlayerBullet')
+        self.collider:setCollisionClass('EnemyBullet')
     end
+    self.collider:setObject(self)
 
     if self.direction == Direction.D_UP then
         self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y, self.sprite.w, self.sprite.h, Texture_IMG)
@@ -43,6 +44,7 @@ function Bullet:update(dt)
 
         if self.collider:enter('Boundary') then
             self:destroy()
+            return
         end
 
         if self.collider:enter('Brick') then
@@ -51,6 +53,18 @@ function Bullet:update(dt)
             if brickObject then
                 brickObject:bulletHit(self.direction)
                 self:destroy()
+                return
+            end
+        end
+
+        if self.collisionClass == 'PlayerBullet' then
+            if self.collider:enter('EnemyBullet') then
+                local enemyBulletCollider = self.collider:getEnterCollisionData('EnemyBullet').collider
+                local enemyBulletObject   = enemyBulletCollider:getObject()
+                if enemyBulletObject then
+                    enemyBulletObject:destroy()
+                    self:destroy()
+                end
             end
         end
     else

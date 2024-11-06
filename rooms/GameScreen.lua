@@ -32,10 +32,8 @@ function GameScreen:new()
 end
 
 function GameScreen:update(dt)
-    --self:checkCollisionPlayerWithStaticBodies(dt)
-    --self:checkCollisionBulletsWithStaticBodies()
+
     self:checkPlayersWithTanks(dt)
-    self:checkCollisionPlayerBulletsWithEnemyBullets()
     self:checkCollisionBulletsWithTanks()
     self.area:update(dt)
     world:update(dt)
@@ -88,53 +86,6 @@ function GameScreen:loadLevel(path)
                 self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_ICE})
             end
         end
-    end
-end
-
-function GameScreen:checkCollisionBulletsWithStaticBodies()
-    for key = #staticBodies, 1, -1 do  
-        local staticBody = staticBodies[key]
-        for idx, bullet in ipairs(self.player.bullets) do
-            self:checkCollisionBulletWithStaticBody(bullet, staticBody)
-        end
-
-        for _, tank in ipairs(self.tanks) do
-            for _, bullet in ipairs(tank.bullets) do
-                self:checkCollisionBulletWithStaticBody(bullet, staticBody)
-            end
-        end
-    end
-end
-
-function GameScreen:checkCollisionBulletWithStaticBody(bullet, staticBody)
-    local staticRect = {
-        x = math.floor(staticBody.x),
-        y = math.floor(staticBody.y),
-        w = math.floor(staticBody.collisionRect.w),
-        h = math.floor(staticBody.collisionRect.h)
-    }
-    local bulletRect = {
-        x = math.floor(bullet.x),
-        y = math.floor(bullet.y),
-        w = math.floor(bullet.collisionRect.w),
-        h = math.floor(bullet.collisionRect.h)
-    }
-
-    local isCollidingX = (staticRect.x <= bulletRect.x + bulletRect.w) and (staticRect.x + staticRect.w >= bulletRect.x)
-    local isCollidingY = (staticRect.y <= bulletRect.y + bulletRect.h) and (staticRect.y + staticRect.h >= bulletRect.y)
-
-    local isBrick = staticBody.type == SpriteType.ST_BRICK_WALL
-    local isWall  = staticBody.type == SpriteType.ST_STONE_WALL
-
-    if isCollidingX and isCollidingY and isBrick then
-        staticBody:bulletHit(bullet.direction)
-        bullet:destroy()
-    elseif isCollidingX and isCollidingY and isWall then
-        if bullet.speed >= 1.3 * BulletDefaultSpeed then
-            staticBody.toErase = true
-            table.remove(staticBodies, key) 
-        end
-        bullet:destroy()
     end
 end
 
@@ -191,40 +142,53 @@ function GameScreen:checkPlayersWithTanks(dt)
     end
 end
 
-function GameScreen:checkCollisionPlayerBulletsWithEnemyBullets()
-    for _, player in ipairs(self.players) do
-        for _, tank in ipairs(self.tanks) do
-            for _, playerBullet in ipairs(player.bullets) do
-                for _, tankBullet in ipairs(tank.bullets) do
-                    local playerBulletRect = {
-                        x = math.floor(playerBullet.x),
-                        y = math.floor(playerBullet.y), 
-                        w = math.floor(playerBullet.collisionRect.w), 
-                        h = math.floor(playerBullet.collisionRect.h)
-                    }
-        
-                    local tankBulletRect = {
-                        x = math.floor(tankBullet.x),
-                        y = math.floor(tankBullet.y), 
-                        w = math.floor(tankBullet.collisionRect.w), 
-                        h = math.floor(tankBullet.collisionRect.h)
-                    }
-        
-                    local isCollidingX = (playerBulletRect.x <= tankBulletRect.x + tankBulletRect.w) and (playerBulletRect.x + playerBulletRect.w >= tankBulletRect.x)
-                    local isCollidingY = (playerBulletRect.y <= tankBulletRect.y + tankBulletRect.h) and (playerBulletRect.y + playerBulletRect.h >= tankBulletRect.y)
-
-                    if isCollidingX and isCollidingY then
-                        playerBullet:destroy()
-                        tankBullet:destroy()
-                    end
-                end 
-            end
-        end
-    end
-end
-
 function GameScreen:checkCollisionBulletsWithTanks()
     for _, player in ipairs(self.players) do
+        for _, playerBullet in ipairs(player.bullets) do
+            if playerBullet.collider:enter('Enemy') then
+                local enemyCollider = playerBullet.collider:getEnterCollisionData('Enemy').collider
+                local enemyObject   = enemyCollider:getObject()
+                if enemyObject then 
+                    enemyObject:destroyTank()
+                    playerBullet:destroy()
+                    self.enemyToKill = self.enemyToKill - 1
+                    self.enemyStatisticsMarker[#self.enemyStatisticsMarker].toErase = true
+                    table.remove(self.enemyStatisticsMarker, #self.enemyStatisticsMarker)
+                    
+                    for i, tank in ipairs(self.tanks) do
+                        if tank == enemyObject then
+                            table.remove(self.tanks, i)
+                            break
+                        end
+                    end
+
+                    if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
+                        timer:after(0.1, function() 
+                            local xPos = {1, 192, 384}
+                            local type = {SpriteType.ST_TANK_A, SpriteType.ST_TANK_B, SpriteType.ST_TANK_C, SpriteType.ST_TANK_D}
+                            table.insert(self.tanks, self.area:addGameObject('Enemy', xPos[love.math.random(1, 3)], 1, {type = SpriteType.ST_TANK_A}))    
+                            end)
+                    elseif self.enemyToKill == 0 then
+                        timer:after(2, function()  gotoRoom('StartScreen') end)
+                    end
+                    break 
+                end
+            end
+        end
+    end 
+
+
+
+    --[[if self.collider:enter('Brick') then
+        local brickCollider = self.collider:getEnterCollisionData('Brick').collider
+        local brickObject   = brickCollider:getObject()
+        if brickObject then
+            brickObject:bulletHit(self.direction)
+            self:destroy()
+            return
+        end
+    end]]
+    --[[for _, player in ipairs(self.players) do
         for _, playerBullet in ipairs(player.bullets) do 
             for i = #self.tanks, 1, -1 do 
                 local tank = self.tanks[i]
@@ -308,7 +272,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                 end
             end
         end
-    end
+    end]]
 end
 
 function GameScreen:drawStatisticsRect()
@@ -324,6 +288,7 @@ function GameScreen:initCollisionClass()
     world:addCollisionClass('EnemyBullet')
     world:addCollisionClass('Eagle')
     world:addCollisionClass('Player', {ignores = {'PlayerBullet'}})
+    world:addCollisionClass('Enemy', {ignores = {'EnemyBullet'}})
 end
 
 function GameScreen:initBoundary()

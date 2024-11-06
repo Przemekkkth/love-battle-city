@@ -17,6 +17,8 @@ function Enemy:new(area, x, y, opts)
     self.bulletMaxSize = 1
     self.frozenTime = 0
     self.timer = Timer()
+    self.collider:setCollisionClass('Enemy')
+    self.collider:setObject(self)
 
     if self.type == SpriteType.ST_TANK_B then
         self.defaultSpeed = TankDefaultSpeed * 1.3
@@ -72,10 +74,6 @@ function Enemy:draw()
         Engine::getEngine().getRenderer()->drawRect(&r, c, true);
     }]]
     Enemy.super.draw(self)
-end
-
-function Enemy:destroy()
-
 end
 
 function Enemy:scoreForHit()

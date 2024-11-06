@@ -97,14 +97,14 @@ function Tank:update(dt)
     end
 
     self:checkBulletLive()
-    self:clamp()
+    --self:clamp()
 end
 
 function Tank:draw()
-    local tankX, tankY = self.collider:getPosition()
     if self:testFlag(TankStateFlag.TSF_MENU) or self:testFlag(TankStateFlag.TSF_CREATE) or self.isMenu then
         self.animation:draw(Texture_IMG, self.x, self.y)
     elseif self:testFlag(TankStateFlag.TSF_LIFE) then 
+        local tankX, tankY = self.collider:getPosition()
         self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
     end
 end
@@ -235,17 +235,24 @@ function Tank:fire()
         local tankDir = (self:testFlag(TankStateFlag.TSF_ON_ICE) and self.new_direction or self.direction)
         local xPos, yPos = self.collider:getPosition()
 
+        local collisionClassName = nil
+        if self.type == SpriteType.ST_PLAYER_1 or self.type == SpriteType.ST_PLAYER_2 then
+            collisionClassName = 'PlayerBullet'
+        else
+            collisionClassName = 'EnemyBullet'
+        end
+
         local bullet = nil --self.area:addGameObject('Bullet', xPos, yPos, {direction = tankDir, type = SpriteType.ST_BULLET})
         local tankSize = 32 -- px
         local bulletSize = 8
         if tankDir == Direction.D_UP then
-            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos - tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
+            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos - tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET, collisionClass = collisionClassName})
         elseif tankDir == Direction.D_RIGHT then
-            bullet = self.area:addGameObject('Bullet', xPos + tankSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
+            bullet = self.area:addGameObject('Bullet', xPos + tankSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET, collisionClass = collisionClassName})
         elseif tankDir == Direction.D_DOWN then
-            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos + tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
+            bullet = self.area:addGameObject('Bullet', xPos - bulletSize / 2, yPos + tankSize / 2 - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET, collisionClass = collisionClassName})
         elseif tankDir == Direction.D_LEFT then
-            bullet = self.area:addGameObject('Bullet', xPos - tankSize / 2 - bulletSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET})
+            bullet = self.area:addGameObject('Bullet', xPos - tankSize / 2 - bulletSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET, collisionClass = collisionClassName})
         end
         table.insert(self.bullets, bullet)
     end
@@ -379,11 +386,12 @@ function Tank:destroyTank()
     self.sprite = spriteData[SpriteType.ST_DESTROY_TANK][1]
     self.y = self.y - 16
     self.x = self.x - 16
-    self.collisionRect.w = 0
-    self.collisionRect.h = 0
+    self.collider:destroy()
 
     self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
     local x = self.sprite.x / self.sprite.w + 1
     self.animation = Anim8.newAnimation( self.grid(x, '1-6'), self.sprite.frameDuration, 'pauseAtEnd')
-    timer:after(7*self.sprite.frameDuration, function() self.toErase = true end)
+    timer:after(7*self.sprite.frameDuration, function() 
+        self.toErase = true 
+    end)
 end
