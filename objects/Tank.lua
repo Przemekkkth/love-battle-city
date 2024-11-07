@@ -70,6 +70,8 @@ function Tank:draw()
     elseif self:testFlag(TankStateFlag.TSF_LIFE) then 
         local tankX, tankY = self.collider:getPosition()
         self.animation:draw(Texture_IMG, tankX - self.tankWidth / 2 - 3, tankY - self.tankHeight / 2 - 3)
+    elseif self:testFlag(TankStateFlag.TSF_DESTROYED) then
+        self.animation:draw(Texture_IMG, self.x, self.y)
     end
 end
 
@@ -315,13 +317,15 @@ function Tank:destroyTank()
     self:clearFlag(TankStateFlag.TSF_BONUS) 
     self.lives = self.lives - 1
     if self.lives <= 0 then
+        local tankSize = 32
         self.stop = true
         self:clearFlag(TankStateFlag.TSF_LIFE)
         self:setFlag(TankStateFlag.TSF_DESTROYED)
         self.speed = 0
         self.sprite = spriteData[SpriteType.ST_DESTROY_TANK][1]
-        self.y = self.y - 16
-        self.x = self.x - 16
+        self.x, self.y = self.collider:getPosition()
+        self.x = self.x - tankSize 
+        self.y = self.y - tankSize 
         self.collider:destroy()
     
         self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
