@@ -138,9 +138,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                             table.insert(self.players, self.player)
                         end)
                     else
-                        self.isGameOver = true
-                        timer:tween(2.5, self, {yGameOverText = 200}, 'in-out-quad')
-                        timer:after(3.0, function()  gotoRoom('MenuScreen') end)
+                        self:setGameOver()
                     end
                     break 
                 end
@@ -191,6 +189,7 @@ function GameScreen:checkEagle()
         if enemyBulletObject then
             enemyBulletObject:destroy()
             self.eagle:destroy()
+            self:setGameOver()
             return
         end
     end
@@ -201,7 +200,14 @@ function GameScreen:checkEagle()
         if playerBulletObject then
             playerBulletObject:destroy()
             self.eagle:destroy()
+            self:setGameOver()
             return
         end
     end
+end
+
+function GameScreen:setGameOver()
+    self.isGameOver = true
+    timer:tween(2.5, self, {yGameOverText = 200}, 'in-out-quad')
+    timer:after(3.0, function()  gotoRoom('MenuScreen') end)
 end
