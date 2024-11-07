@@ -177,12 +177,14 @@ end
 
 function Tank:getAnim()
     local xAnim
-    if self.lives == 1 then
+    if self:testFlag(TankStateFlag.TSF_BONUS) then
         xAnim = 1
-    elseif self.lives == 2 then
+    elseif self.lives == 1 then
         xAnim = 5
-    elseif self.lives == 3 then
+    elseif self.lives == 2 then
         xAnim = 9
+    elseif self.lives == 3 then
+        xAnim = 13
     elseif self.lives == 4 then
         xAnim = 17
     end
@@ -308,21 +310,35 @@ end
 function Tank:destroyTank()
     if not self:testFlag(TankStateFlag.TSF_LIFE) then
         return
-    end 
+    end
 
-    self.stop = true
-    self:clearFlag(TankStateFlag.TSF_LIFE)
-    self:setFlag(TankStateFlag.TSF_DESTROYED)
-    self.speed = 0
-    self.sprite = spriteData[SpriteType.ST_DESTROY_TANK][1]
-    self.y = self.y - 16
-    self.x = self.x - 16
-    self.collider:destroy()
-
-    self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
-    local x = self.sprite.x / self.sprite.w + 1
-    self.animation = Anim8.newAnimation( self.grid(x, '1-6'), self.sprite.frameDuration, 'pauseAtEnd')
-    timer:after(7*self.sprite.frameDuration, function() 
-        self.toErase = true 
-    end)
+    self:clearFlag(TankStateFlag.TSF_BONUS) 
+    self.lives = self.lives - 1
+    if self.lives <= 0 then
+        self.stop = true
+        self:clearFlag(TankStateFlag.TSF_LIFE)
+        self:setFlag(TankStateFlag.TSF_DESTROYED)
+        self.speed = 0
+        self.sprite = spriteData[SpriteType.ST_DESTROY_TANK][1]
+        self.y = self.y - 16
+        self.x = self.x - 16
+        self.collider:destroy()
+    
+        self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
+        local x = self.sprite.x / self.sprite.w + 1
+        self.animation = Anim8.newAnimation( self.grid(x, '1-6'), self.sprite.frameDuration, 'pauseAtEnd')
+        timer:after(7*self.sprite.frameDuration, function() 
+            self.toErase = true 
+        end)
+    else
+        if self.direction == Direction.D_UP then
+            self.animation = self:getAnim().up
+        elseif self.direction == Direction.D_RIGHT then
+            self.animation = self:getAnim().right
+        elseif self.direction == Direction.D_DOWN then
+            self.animation = self:getAnim().down
+        elseif self.direction == Direction.D_LEFT then
+            self.animation = self:getAnim().left
+        end
+    end
 end

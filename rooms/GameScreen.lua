@@ -251,7 +251,7 @@ function GameScreen:generateEnemy()
 
     p = math.random()
     if p < 0.12 then
-        enemy:setFlag(TSF_BONUS)
+        enemy:setFlag(TankStateFlag.TSF_BONUS)
     end
     
     self.enemyField = self.enemyField + 1
