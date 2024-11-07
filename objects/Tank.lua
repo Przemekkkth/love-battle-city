@@ -1,6 +1,8 @@
 Tank = Entity:extend()
 
 function Tank:new(area, x, y, opts)
+    self.lives = 1
+    self.level = 0 -- this is only for Player
     Tank.super.new(self, area, x, y, opts)
 
     self.area = area
@@ -14,19 +16,28 @@ function Tank:new(area, x, y, opts)
     self.frozenTime = 0
     self.flags = {}
     self.stop = false
-    self.level = 0
     self.bullets = {}
     self.collider:destroy()
     self.bulletMaxSize = 2
-    self.lives = 1
-
+    
     self.tankWidth = self.sprite.w - 6
     self.tankHeight = self.sprite.h - 6
     self.collider = world:newRectangleCollider(self.x, self.y, self.tankWidth, self.tankHeight)
     self.collider:setFixedRotation(true)
     self:clearFlag(TankStateFlag.TSF_LIFE)
     
-    self:respawn()     
+    if self.type == SpriteType.ST_TANK_A then
+        
+    elseif self.type == SpriteType.ST_TANK_B then
+        self.speed = 1.4 * self.speed
+    elseif self.type == SpriteType.ST_TANK_C then
+        self.speed = 1.1 * self.speed
+    elseif self.type == SpriteType.ST_TANK_D then
+        self.speed = 0.9 * self.speed
+        self.bulletMaxSize = 3
+    end
+
+    self:respawn()
 end
 
 function Tank:update(dt)
@@ -183,13 +194,14 @@ function Tank:getAnim()
     end
 
     local yAnim = nil
+    
     if self.type == SpriteType.ST_TANK_A then
         yAnim = '1-2'
     elseif self.type == SpriteType.ST_TANK_B then
         yAnim = '3-4'
     elseif self.type == SpriteType.ST_TANK_C then
         yAnim = '5-6'
-    elseif self.type == SpriteType.ST_TANK_B then
+    elseif self.type == SpriteType.ST_TANK_D then
         yAnim = '7-8'
     end
 
@@ -205,10 +217,10 @@ function Tank:getAnim()
         end
     end
     
-    self.tankAnim = {up     = Anim8.newAnimation( self.grid(xAnim, '1-2'), self.sprite.frameDuration ),
-                    right  = Anim8.newAnimation( self.grid(xAnim + 1, '1-2'), self.sprite.frameDuration ),
-                    down   = Anim8.newAnimation( self.grid(xAnim + 2, '1-2'), self.sprite.frameDuration ),
-                    left   = Anim8.newAnimation( self.grid(xAnim + 3, '1-2'), self.sprite.frameDuration ),
+    self.tankAnim = {up     = Anim8.newAnimation( self.grid(xAnim, yAnim), self.sprite.frameDuration ),
+                    right  = Anim8.newAnimation( self.grid(xAnim + 1, yAnim), self.sprite.frameDuration ),
+                    down   = Anim8.newAnimation( self.grid(xAnim + 2, yAnim), self.sprite.frameDuration ),
+                    left   = Anim8.newAnimation( self.grid(xAnim + 3, yAnim), self.sprite.frameDuration ),
                     }
     return self.tankAnim
 end

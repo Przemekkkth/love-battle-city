@@ -12,9 +12,10 @@ function GameScreen:new()
     self.eagle = self.area:addGameObject('Eagle', 12*16, 384, {type = SpriteType.ST_EAGLE})
 
     self.tanks = {}
-    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[1][1], EnemyStartingPoints[1][2], {type = SpriteType.ST_TANK_A}))
-    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[2][1], EnemyStartingPoints[2][2], {type = SpriteType.ST_TANK_B}))
-    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[3][1], EnemyStartingPoints[3][2], {type = SpriteType.ST_TANK_C}))
+    self.enemyField = 1 -- 1-3
+    self:generateEnemy()
+    self:generateEnemy()
+    self:generateEnemy()
 
     self.enemyStatisticsMarker = {}
     self.enemyToKill = 6
@@ -109,11 +110,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     end
 
                     if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
-                        timer:after(0.1, function() 
-                            local xPos = {EnemyStartingPoints[1][1], EnemyStartingPoints[2][1], EnemyStartingPoints[3][1]}
-                            local type = {SpriteType.ST_TANK_A, SpriteType.ST_TANK_B, SpriteType.ST_TANK_C, SpriteType.ST_TANK_D}
-                            table.insert(self.tanks, self.area:addGameObject('Enemy', xPos[love.math.random(1, 3)], 1, {type = SpriteType.ST_TANK_A}))    
-                            end)
+                        timer:after(0.1, function() self:generateEnemy() end)
                     elseif self.enemyToKill == 0 then
                         timer:after(2, function()  gotoRoom('StartScreen') end)
                     end
@@ -210,4 +207,54 @@ function GameScreen:setGameOver()
     self.isGameOver = true
     timer:tween(2.5, self, {yGameOverText = 200}, 'in-out-quad')
     timer:after(3.0, function()  gotoRoom('MenuScreen') end)
+end
+
+function GameScreen:generateEnemy()
+    local p = math.random() -- Generates a random float between 0 and 1
+    local spriteType
+
+    -- Determine the type of enemy based on the random number and current level
+    if p < (0.00735 * currentLevel + 0.09265) then
+        spriteType = SpriteType.ST_TANK_D
+    else
+        local randomType = {SpriteType.ST_TANK_A, SpriteType.ST_TANK_B, SpriteType.ST_TANK_C}
+        spriteType = randomType[love.math.random(1, 3)]
+    end
+
+    local xPos = {EnemyStartingPoints[1][1], EnemyStartingPoints[2][1], EnemyStartingPoints[3][1]}
+
+    local a, b, c
+    if currentLevel <= 17 then
+        a = -0.040625 * currentLevel + 0.940625
+        b = -0.028125 * currentLevel + 0.978125
+        c = -0.014375 * currentLevel + 0.994375
+    else
+        a = -0.012778 * currentLevel + 0.467222
+        b = -0.025000 * currentLevel + 0.925000
+        c = -0.036111 * currentLevel + 1.363889
+    end
+
+    -- Assign lives to the enemy based on probability
+    p = math.random()
+    local livesCount
+    if p < a then
+        livesCount = 1
+    elseif p < b then
+        livesCount = 2
+    elseif p < c then
+        livesCount = 3
+    else
+        livesCount = 4
+    end    
+
+    local enemy = self.area:addGameObject('Enemy', xPos[self.enemyField], 1, {type = spriteType, lives = livesCount})
+
+    p = math.random()
+    if p < 0.12 then
+        enemy:setFlag(TSF_BONUS)
+    end
+    
+    self.enemyField = self.enemyField + 1
+    self.enemyField = (self.enemyField % 3) + 1
+    table.insert(self.tanks, enemy)
 end
