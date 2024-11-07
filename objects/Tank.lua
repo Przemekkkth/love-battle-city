@@ -18,58 +18,13 @@ function Tank:new(area, x, y, opts)
     self.bullets = {}
     self.collider:destroy()
     self.bulletMaxSize = 2
+    self.lives = 1
+
     self.tankWidth = self.sprite.w - 6
     self.tankHeight = self.sprite.h - 6
     self.collider = world:newRectangleCollider(self.x, self.y, self.tankWidth, self.tankHeight)
     self.collider:setFixedRotation(true)
     self:clearFlag(TankStateFlag.TSF_LIFE)
-
-    
-    local xAnim
-    if self.type == SpriteType.ST_TANK_A then 
-        xAnim = 1
-        self.level = love.math.random(0, 3)
-    elseif self.type == SpriteType.ST_TANK_B then 
-        xAnim = 5
-        self.level = love.math.random(0, 3)
-    elseif self.type == SpriteType.ST_TANK_C then 
-        xAnim = 9
-        self.level = love.math.random(0, 3)
-    elseif self.type == SpriteType.ST_TANK_D then 
-        xAnim = 13
-        self.level = love.math.random(0, 3)
-    elseif self.type == SpriteType.ST_TANK_B then 
-        xAnim = 17
-        self.level = love.math.random(0, 3)
-    elseif self.type == SpriteType.ST_PLAYER_1 then 
-        xAnim = 21
-    elseif self.type == SpriteType.ST_PLAYER_2 then 
-        xAnim = 25
-    end
-    
-    local y = self.sprite.y / 32 + 1
-
-    self.type0Anim = {up     = Anim8.newAnimation( self.grid(xAnim, '1-2'), self.sprite.frameDuration ),
-                      right  = Anim8.newAnimation( self.grid(xAnim + 1, '1-2'), self.sprite.frameDuration ),
-                      down   = Anim8.newAnimation( self.grid(xAnim + 2, '1-2'), self.sprite.frameDuration ),
-                      left   = Anim8.newAnimation( self.grid(xAnim + 3, '1-2'), self.sprite.frameDuration ),
-                     }
-
-    self.type1Anim = {up     = Anim8.newAnimation( self.grid(xAnim, '3-4'), self.sprite.frameDuration ),
-                      right  = Anim8.newAnimation( self.grid(xAnim + 1, '3-4'), self.sprite.frameDuration ),
-                      down   = Anim8.newAnimation( self.grid(xAnim + 2, '3-4'), self.sprite.frameDuration ),
-                      left   = Anim8.newAnimation( self.grid(xAnim + 3, '3-4'), self.sprite.frameDuration ),
-                     }
-    self.type2Anim = {up     = Anim8.newAnimation( self.grid(xAnim, '5-6'), self.sprite.frameDuration ),
-                     right  = Anim8.newAnimation( self.grid(xAnim + 1, '5-6'), self.sprite.frameDuration ),
-                     down   = Anim8.newAnimation( self.grid(xAnim + 2, '5-6'), self.sprite.frameDuration ),
-                     left   = Anim8.newAnimation( self.grid(xAnim + 3, '5-6'), self.sprite.frameDuration ),
-                    }
-    self.type3Anim = {up     = Anim8.newAnimation( self.grid(xAnim, '7-8'), self.sprite.frameDuration ),
-                    right  = Anim8.newAnimation( self.grid(xAnim + 1, '7-8'), self.sprite.frameDuration ),
-                    down   = Anim8.newAnimation( self.grid(xAnim + 2, '7-8'), self.sprite.frameDuration ),
-                    left   = Anim8.newAnimation( self.grid(xAnim + 3, '7-8'), self.sprite.frameDuration ),
-                   }   
     
     self:respawn()     
 end
@@ -210,15 +165,52 @@ function Tank:respawn()
 end
 
 function Tank:getAnim()
-    if self.level == 0 then
-        return self.type0Anim
-    elseif self.level == 1 then
-        return self.type1Anim
-    elseif self.level == 2 then
-        return self.type2Anim
-    elseif self.level == 3 then
-        return self.type3Anim
+    local xAnim
+    if self.lives == 1 then
+        xAnim = 1
+    elseif self.lives == 2 then
+        xAnim = 5
+    elseif self.lives == 3 then
+        xAnim = 9
+    elseif self.lives == 4 then
+        xAnim = 17
     end
+
+    if self.type == SpriteType.ST_PLAYER_1 then
+        xAnim = 21
+    elseif self.type == SpriteType.ST_PLAYER_2 then
+        xAnim = 25
+    end
+
+    local yAnim = nil
+    if self.type == SpriteType.ST_TANK_A then
+        yAnim = '1-2'
+    elseif self.type == SpriteType.ST_TANK_B then
+        yAnim = '3-4'
+    elseif self.type == SpriteType.ST_TANK_C then
+        yAnim = '5-6'
+    elseif self.type == SpriteType.ST_TANK_B then
+        yAnim = '7-8'
+    end
+
+    if self.type == SpriteType.ST_PLAYER_1 or self.type == SpriteType.ST_PLAYER_2 then
+        if self.level == 0 then
+            yAnim = '1-2'
+        elseif self.level == 1 then
+            yAnim = '3-4'
+        elseif self.level == 2 then
+            yAnim = '5-6'
+        elseif self.level == 3 then
+            yAnim = '7-8'
+        end
+    end
+    
+    self.tankAnim = {up     = Anim8.newAnimation( self.grid(xAnim, '1-2'), self.sprite.frameDuration ),
+                    right  = Anim8.newAnimation( self.grid(xAnim + 1, '1-2'), self.sprite.frameDuration ),
+                    down   = Anim8.newAnimation( self.grid(xAnim + 2, '1-2'), self.sprite.frameDuration ),
+                    left   = Anim8.newAnimation( self.grid(xAnim + 3, '1-2'), self.sprite.frameDuration ),
+                    }
+    return self.tankAnim
 end
 
 function Tank:fire()
