@@ -34,6 +34,7 @@ end
 
 function GameScreen:update(dt)
     self:checkCollisionBulletsWithTanks()
+    self:setEnemyTarget()
     self:checkEagle()
     self.area:update(dt)
     world:update(dt)
@@ -110,7 +111,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     end
 
                     if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
-                        timer:after(0.1, function() self:generateEnemy() end)
+                        self:generateEnemy()
                     elseif self.enemyToKill == 0 then
                         timer:after(2, function()  gotoRoom('StartScreen') end)
                     end
@@ -257,4 +258,37 @@ function GameScreen:generateEnemy()
     self.enemyField = self.enemyField + 1
     self.enemyField = (self.enemyField % 3) + 1
     table.insert(self.tanks, enemy)
+end
+
+function GameScreen:setEnemyTarget()
+    local min_metric
+    local metric 
+    local target = {x = 0, y = 0}
+    for _, tank in ipairs(self.tanks) do
+        min_metric = 832
+        if tank.type == SpriteType.ST_TANK_A or tank.type == SpriteType.ST_TANK_D then
+            for _, player in ipairs(self.players) do
+                local tankX, tankY     = tank.collider:getPosition()
+                local playerX, playerY = player.collider:getPosition()
+                metric = math.abs(playerX - tankX) + math.abs(playerY - tankY)
+                if metric < min_metric then
+                    min_metric = metric
+                    local tankSize = 32
+                    target = {x = playerX + tankSize / 2, y = playerY + tankSize / 2}
+                end
+            end
+        end
+
+        
+        local eagleX, eagleY = self.eagle.collider:getPosition()
+        local tankX, tankY   = tank.collider:getPosition()
+        local eagleSize = 32
+        metric = math.abs(eagleX - tankX) + math.abs(eagleY - tankY)
+        if metric < min_metric then
+            min_metric = metric
+            target = {x = eagleX + eagleSize / 2, y = eagleY + eagleSize / 2}
+        end
+
+        tank.target = target
+    end
 end
