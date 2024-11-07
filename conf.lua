@@ -5,7 +5,7 @@ WindowSize = {w = MapRect.w + StatusRect.w, h = MapRect.h}
 GameOverText = "GAME OVER"
 TileSize = 16
 PlayerStartingPoints = { {132, 384}, {256, 384} }
-EnemyStartingPoints  = { {1, 1}, {192, 1}, {384, 1} } 
+EnemyStartingPoints  = { {1, 1}, {196, 1}, {386, 1} } 
 LevelStartTime = 2.0
 SlipTime = 0.38
 EnemyReadyTime = 0.5
