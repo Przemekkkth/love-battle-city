@@ -78,10 +78,8 @@ function Tank:update(dt)
     if self:testFlag(TankStateFlag.TSF_LIFE) then
         if not self.stop and not self:testFlag(TankStateFlag.TSF_FROZEN) then
             if self.direction == Direction.D_UP then
-                --self.y = self.y - self.speed * dt
                 self.collider:setLinearVelocity(0, -self.speed)
             elseif self.direction == Direction.D_LEFT then
-                --self.x = self.x - self.speed * dt
                 self.collider:setLinearVelocity(-self.speed, 0)
             elseif self.direction == Direction.D_RIGHT then
                 self.collider:setLinearVelocity(self.speed, 0)
@@ -98,7 +96,6 @@ function Tank:update(dt)
     end
 
     self:checkBulletLive()
-    --self:clamp()
 end
 
 function Tank:draw()
@@ -198,7 +195,6 @@ function Tank:respawn()
     timer:after(10*self.sprite.frameDuration, function()
         self:clearFlag(TankStateFlag.TSF_CREATE)
         self:setFlag(TankStateFlag.TSF_LIFE)
-        self:enableCollisionRect()
         self.stop = false
         
         if self.type == SpriteType.ST_PLAYER_1 or self.type == SpriteType.ST_PLAYER_2 then
@@ -211,8 +207,6 @@ function Tank:respawn()
         end
 
     end)
-
-    self:disableCollisionRect()
 end
 
 function Tank:getAnim()
@@ -306,74 +300,6 @@ function Tank:checkBulletLive()
         end
     end
 end 
-
-function Tank:clampX()
-    local tankSize = 32
-    if self.x <= 0 then
-        self.x = 0
-    elseif self.x + tankSize >= SCREEN_WIDTH - StatusRect.w then
-        self.x = SCREEN_WIDTH - StatusRect.w - tankSize
-    end
-
-    local tankX, tankY = self.collider:getPosition()
-    if tankX < 0 and not self.stop then 
-        local tankVX, tankVY = self.collider:getLinearVelocity()
-        self.collider:setLinearVelocity(0, tankVY)
-        self.stop = true
-    end
-end
-
-function Tank:clampY()
-    local tankSize = 32
-    if self.y <= 0 then
-        self.y = 0
-    elseif self.y + tankSize >= SCREEN_HEIGHT then
-        self.y = SCREEN_HEIGHT - tankSize
-    end
-
-    --local tankX, tankY = self.collider:getPosition()
-    
-
-end
-
-function Tank:clamp()
-    self:clampX()
-    self:clampY()
-end
-
-function Tank:collide(_intersectRect, dt)
-    --
-    local tankRect = {x = math.floor(self.x+2), y = math.floor(self.y+2), w = 32-4, h = 32-4}
-    local otherRect = {x = math.floor(_intersectRect.collisionRect.x), y = math.floor(_intersectRect.collisionRect.y), w = math.floor(_intersectRect.collisionRect.w), h = math.floor(_intersectRect.collisionRect.h)}
-
-    -- AABB
-    local isCollidingX = (tankRect.x < otherRect.x + otherRect.w) and (tankRect.x + tankRect.w > otherRect.x)
-    local isCollidingY = (tankRect.y < otherRect.y + otherRect.h) and (tankRect.y + tankRect.h > otherRect.y)
-
-    if isCollidingX and isCollidingY then
-        if (self.direction == Direction.D_UP and otherRect.y < tankRect.y) then
-            self.stop = true
-            self.slipTime = 0
-            self.y = self.y + self.speed*dt + 0.1
-        elseif (self.direction == Direction.D_DOWN and otherRect.y + otherRect.h > tankRect.y + tankRect.h) then
-            self.stop = true
-            self.slipTime = 0
-            self.y = self.y - self.speed*dt - 0.1
-        elseif (self.direction == Direction.D_LEFT and otherRect.x < tankRect.x) then
-            self.stop = true
-            self.slipTime = 0
-            self.x = self.x + self.speed*dt + 0.1
-        elseif (self.direction == Direction.D_RIGHT and otherRect.x + otherRect.w > tankRect.x + tankRect.w) then
-            self.stop = true
-            self.slipTime = 0
-            self.x = self.x - self.speed*dt - 0.1
-        end
-    end
-end
-
-function Tank:bullets()
-    return self.bullets
-end
 
 function Tank:destroyTank()
     if not self:testFlag(TankStateFlag.TSF_LIFE) then

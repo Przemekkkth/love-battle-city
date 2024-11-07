@@ -14,11 +14,6 @@ function Entity:new(area, x, y, opts)
     self.frameDisplayTime = 0
     self.currentFrame = 0
 
-    self.collisionRect = {}
-    self.collisionRect.x = self.x
-    self.collisionRect.y = self.y
-    self.collisionRect.w = self.sprite.w
-    self.collisionRect.h = self.sprite.h
     self.grid = Anim8.newGrid( self.sprite.w, self.sprite.h, Texture_IMG:getWidth(), Texture_IMG:getHeight() )
 
     self.quad = love.graphics.newQuad(self.sprite.x, self.sprite.y, self.sprite.w, self.sprite.h, Texture_IMG)
@@ -49,31 +44,4 @@ end
 
 function Entity:getSize()
     return {x = self.sprite.w, y = self.sprite.h}
-end
-
-function Entity:disableCollisionRect()
-    self.collisionRect.w = 0
-    self.collisionRect.h = 0
-end
-
-function Entity:enableCollisionRect()
-    self.collisionRect.w = self.sprite.w
-    self.collisionRect.h = self.sprite.h
-end
-
-function intersectRect(rect1, rect2)
-    local intersect_rect = {
-        x = math.max(rect1.x, rect2.x),
-        y = math.max(rect1.y, rect2.y),
-        w = math.min(rect1.x + rect1.w, rect2.x + rect2.w) - math.max(rect1.x, rect2.x),
-        h = math.min(rect1.y + rect1.h, rect2.y + rect2.h) - math.max(rect1.y, rect2.y)
-    }
-
-    -- Check if there is an intersection
-    if intersect_rect.w < 0 or intersect_rect.h < 0 then
-        -- No intersection, return nil
-        return nil
-    end
-
-    return intersect_rect
 end

@@ -6,15 +6,15 @@ function GameScreen:new()
     self:initBoundary()
 
     self.area = Area(self)
-    self.player = self.area:addGameObject('Player', 128, 384, {type = SpriteType.ST_PLAYER_1})
+    self.player = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[1][2], {type = SpriteType.ST_PLAYER_1})
     self.players = {}
     table.insert(self.players, self.player)
     self.eagle = self.area:addGameObject('Eagle', 12*16, 384, {type = SpriteType.ST_EAGLE})
 
     self.tanks = {}
-    table.insert(self.tanks, self.area:addGameObject('Enemy', 1, 1, {type = SpriteType.ST_TANK_A}))
-    table.insert(self.tanks, self.area:addGameObject('Enemy', 192, 1, {type = SpriteType.ST_TANK_B}))
-    table.insert(self.tanks, self.area:addGameObject('Enemy', 384, 1, {type = SpriteType.ST_TANK_C}))
+    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[1][1], EnemyStartingPoints[1][2], {type = SpriteType.ST_TANK_A}))
+    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[2][1], EnemyStartingPoints[2][2], {type = SpriteType.ST_TANK_B}))
+    table.insert(self.tanks, self.area:addGameObject('Enemy', EnemyStartingPoints[3][1], EnemyStartingPoints[3][2], {type = SpriteType.ST_TANK_C}))
 
     self.enemyStatisticsMarker = {}
     self.enemyToKill = 6
@@ -110,7 +110,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
 
                     if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
                         timer:after(0.1, function() 
-                            local xPos = {1, 192, 384}
+                            local xPos = {EnemyStartingPoints[1][1], EnemyStartingPoints[2][1], EnemyStartingPoints[3][1]}
                             local type = {SpriteType.ST_TANK_A, SpriteType.ST_TANK_B, SpriteType.ST_TANK_C, SpriteType.ST_TANK_D}
                             table.insert(self.tanks, self.area:addGameObject('Enemy', xPos[love.math.random(1, 3)], 1, {type = SpriteType.ST_TANK_A}))    
                             end)
@@ -134,7 +134,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     self.playerLives = self.playerLives - 1
                     if self.playerLives > 0 then
                         timer:after(1, function() 
-                            self.player = self.area:addGameObject('Player', 128, 384, {type = SpriteType.ST_PLAYER_1})
+                            self.player = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[2][1], {type = SpriteType.ST_PLAYER_1})
                             table.insert(self.players, self.player)
                         end)
                     else

@@ -101,11 +101,6 @@ function Bullet:destroy()
     self.animation = Anim8.newAnimation( self.grid(x, '1-5'), self.sprite.frameDuration, 'pauseAtEnd')
     timer:after(5*self.sprite.frameDuration, function() self.toErase = true end)
 
-    self.collisionRect.x = 0
-    self.collisionRect.y = 0
-    self.collisionRect.w = 0
-    self.collisionRect.h = 0
-
     local bulletSize = 8
     if self.direction == Direction.D_UP then
         self.x = self.x + (bulletSize - self.sprite.w) / 2
