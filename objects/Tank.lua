@@ -114,6 +114,9 @@ function Tank:setFlag(flag)
 end
 
 function Tank:setDirection(_direction)
+    if self.direction == _direction then
+        return
+    end
 
     self.direction = _direction
     if not self:testFlag(TankStateFlag.TSF_LIFE) or self:testFlag(TankStateFlag.TSF_CREATE) then
