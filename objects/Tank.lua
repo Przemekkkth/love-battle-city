@@ -334,6 +334,7 @@ function Tank:destroyTank()
         timer:after(7*self.sprite.frameDuration, function() 
             self.toErase = true 
         end)
+        return true
     else
         if self.direction == Direction.D_UP then
             self.animation = self:getAnim().up
@@ -344,5 +345,6 @@ function Tank:destroyTank()
         elseif self.direction == Direction.D_LEFT then
             self.animation = self:getAnim().left
         end
+        return false
     end
 end

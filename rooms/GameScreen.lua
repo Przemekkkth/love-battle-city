@@ -97,23 +97,26 @@ function GameScreen:checkCollisionBulletsWithTanks()
                 local enemyCollider = playerBullet.collider:getEnterCollisionData('Enemy').collider
                 local enemyObject   = enemyCollider:getObject()
                 if enemyObject then 
-                    enemyObject:destroyTank()
-                    playerBullet:destroy()
-                    self.enemyToKill = self.enemyToKill - 1
-                    self.enemyStatisticsMarker[#self.enemyStatisticsMarker].toErase = true
-                    table.remove(self.enemyStatisticsMarker, #self.enemyStatisticsMarker)
                     
-                    for i, tank in ipairs(self.tanks) do
-                        if tank == enemyObject then
-                            table.remove(self.tanks, i)
-                            break
-                        end
-                    end
+                    playerBullet:destroy()
 
-                    if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
-                        self:generateEnemy()
-                    elseif self.enemyToKill == 0 then
-                        timer:after(2, function()  gotoRoom('StartScreen') end)
+                    if enemyObject:destroyTank() then
+                        self.enemyToKill = self.enemyToKill - 1
+                        self.enemyStatisticsMarker[#self.enemyStatisticsMarker].toErase = true
+                        table.remove(self.enemyStatisticsMarker, #self.enemyStatisticsMarker)
+                    
+                        for i, tank in ipairs(self.tanks) do
+                            if tank == enemyObject then
+                                table.remove(self.tanks, i)
+                                break
+                            end
+                        end
+
+                        if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
+                            self:generateEnemy()
+                        elseif self.enemyToKill == 0 then
+                            timer:after(2, function()  gotoRoom('StartScreen') end)
+                        end
                     end
                     break 
                 end
@@ -268,6 +271,9 @@ function GameScreen:setEnemyTarget()
         min_metric = 832
         if tank.type == SpriteType.ST_TANK_A or tank.type == SpriteType.ST_TANK_D then
             for _, player in ipairs(self.players) do
+                if player.lives <= 0 then
+                    break
+                end
                 local tankX, tankY     = tank.collider:getPosition()
                 local playerX, playerY = player.collider:getPosition()
                 metric = math.abs(playerX - tankX) + math.abs(playerY - tankY)
