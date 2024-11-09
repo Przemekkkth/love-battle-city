@@ -134,9 +134,11 @@ function GameScreen:checkCollisionBulletsWithTanks()
             if tankBullet.collider:enter('Player') then
                 local playerCollider = tankBullet.collider:getEnterCollisionData('Player').collider
                 local playerObject   = playerCollider:getObject()
-                if playerObject then 
-                    playerObject:destroyTank() 
+                if playerObject then  
                     tankBullet:destroy()
+                    if not playerObject:destroyTank() then
+                        break
+                    end
                     self.playerLives = self.playerLives - 1
                     if self.playerLives > 0 then
                         timer:after(1, function() 
@@ -163,7 +165,8 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                     if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
                         print('ST_BONUS_GRENADE')
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
-                        print('ST_BONUS_HELMET')
+                        --print('ST_BONUS_HELMET')
+                        player:addShield()
                     elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
                         print('ST_BONUS_CLOCK')
                     elseif bonusObject.type == SpriteType.ST_BONUS_SHOVEL then

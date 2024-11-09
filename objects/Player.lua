@@ -12,6 +12,17 @@ function Player:new(area, x, y, opts)
         self.collider:setCollisionClass('Player')
         self.collider:setObject(self)
     end
+
+    self.shieldAnim = Anim8.newAnimation( self.grid(31.5, '1-2'), 0.2 )
+end
+
+function Player:draw()
+    Player.super.draw(self)
+    if self:testFlag(TankStateFlag.TSF_SHIELD) then
+        local xPos, yPos = self.collider:getPosition()
+        local tankSize = 32
+        self.shieldAnim:draw(Texture_IMG, xPos - tankSize / 2, yPos - tankSize / 2)
+    end
 end
 
 function Player:update(dt)
@@ -43,6 +54,10 @@ function Player:update(dt)
     elseif not self.stop then
         self.animation:update(dt)
     end
+
+    if self:testFlag(TankStateFlag.TSF_SHIELD) then
+        self.shieldAnim:update(dt)
+    end
 end
 
 function Player:setDirection(_direction)
@@ -58,4 +73,16 @@ end
 
 function Player:bullets()
     Player.super.bullets(self)
+end
+
+function Player:addShield()
+    self:setFlag(TankStateFlag.TSF_SHIELD)
+    timer:after(TankShieldTime, function() self:clearFlag(TankStateFlag.TSF_SHIELD)  end)
+end
+
+function Player:destroyTank()
+    if self:testFlag(TankStateFlag.TSF_SHIELD) then
+        return false
+    end
+    return Player.super.destroyTank(self)
 end

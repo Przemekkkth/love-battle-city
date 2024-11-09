@@ -171,6 +171,9 @@ function Tank:respawn()
         if self.type == SpriteType.ST_PLAYER_1 or self.type == SpriteType.ST_PLAYER_2 then
             self.animation = self:getAnim().up
             self:setDirection(Direction.D_UP)
+            if not self.pointer then 
+                self:addShield()
+            end
         else
             self.animation = self:getAnim().down
             self:setDirection(Direction.D_DOWN)
@@ -314,7 +317,7 @@ end
 
 function Tank:destroyTank()
     if not self:testFlag(TankStateFlag.TSF_LIFE) then
-        return
+        return false
     end
 
     self:clearFlag(TankStateFlag.TSF_BONUS) 

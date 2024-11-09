@@ -10,11 +10,11 @@ LevelStartTime = 2.0
 SlipTime = 0.38
 EnemyReadyTime = 0.5
 ScoreShowTime = 3.0
-BonusShowTime = 10.0
-TankShieldTime = 10.0
+BonusShowTime = 7.0
+TankShieldTime = 7.0
 TankFrozenTime = 8.0
 LevelEndTime = 5.0
-ProtectEagleTime = 15.0
+ProtectEagleTime = 10.0
 BonusBlinkTime = 0.35
 PlayerReloadTime = 0.12
 
