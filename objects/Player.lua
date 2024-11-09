@@ -86,3 +86,17 @@ function Player:destroyTank()
     end
     return Player.super.destroyTank(self)
 end
+
+function Player:increaseLevel()
+    self.level = self.level + 1
+    if self.level >= 3 then
+        self.level = 3
+        self.speed = 1.3 * self.speed
+    end
+    if self.level == 1 then
+        self.speed = 1.1 * self.speed
+    elseif self.level == 2 then
+        self.speed = 1.2 * self.speed
+        self.bulletMaxSize = self.bulletMaxSize + 1
+    end
+end 

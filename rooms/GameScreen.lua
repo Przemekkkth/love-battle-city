@@ -57,7 +57,7 @@ function GameScreen:draw()
         love.graphics.print('Game Over', SCREEN_WIDTH / 2, self.yGameOverText, 0, 1, 1, love.graphics.getFont():getWidth('Game Over') / 2 )
         love.graphics.setColor(1, 1, 1)
     end
-    world:draw()
+    --world:draw()
 end
 
 function GameScreen:loadLevel(path)
@@ -163,9 +163,8 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                 local bonusObject   = bonusCollider:getObject()
                 if bonusObject then
                     if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
-                        print('ST_BONUS_GRENADE')
+                        self:destroyAllEnemmies()
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
-                        --print('ST_BONUS_HELMET')
                         player:addShield()
                     elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
                         print('ST_BONUS_CLOCK')
@@ -174,7 +173,7 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                     elseif bonusObject.type == SpriteType.ST_BONUS_TANK then
                         print('ST_BONUS_TANK')
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
-                        print('ST_BONUS_STAR')
+                        player:increaseLevel()
                     elseif bonusObject.type == SpriteType.ST_BONUS_GUN then
                         print('ST_BONUS_GUN')
                     elseif bonusObject.type == SpriteType.ST_BONUS_BOAT then
@@ -356,5 +355,30 @@ function GameScreen:setEnemyTarget()
         end
 
         tank.target = target
+    end
+end
+
+function GameScreen:destroyAllEnemmies()
+    for i = #self.tanks, 1, -1 do
+        local enemyObject = self.tanks[i]
+        enemyObject.lives = 1
+        if enemyObject:destroyTank() then
+            self.enemyToKill = self.enemyToKill - 1
+            self.enemyStatisticsMarker[#self.enemyStatisticsMarker].toErase = true
+            table.remove(self.enemyStatisticsMarker, #self.enemyStatisticsMarker)
+        
+            for i, tank in ipairs(self.tanks) do
+                if tank == enemyObject then
+                    table.remove(self.tanks, i)
+                    break
+                end
+            end
+
+            if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
+                self:generateEnemy()
+            elseif self.enemyToKill == 0 then
+                timer:after(2, function()  gotoRoom('StartScreen') end)
+            end
+        end
     end
 end
