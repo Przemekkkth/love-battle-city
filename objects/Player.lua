@@ -14,10 +14,16 @@ function Player:new(area, x, y, opts)
     end
 
     self.shieldAnim = Anim8.newAnimation( self.grid(31.5, '1-2'), 0.2 )
+    self.boatImg    = love.graphics.newQuad(29.5 * 32, 96, 32, 32, Texture_IMG)
 end
 
 function Player:draw()
     Player.super.draw(self)
+    if self:testFlag(TankStateFlag.TSF_BOAT) then
+        local xPos, yPos = self.collider:getPosition()
+        local tankSize = 32
+        love.graphics.draw(Texture_IMG, self.boatImg, xPos - tankSize / 2, yPos - tankSize / 2)
+    end
     if self:testFlag(TankStateFlag.TSF_SHIELD) then
         local xPos, yPos = self.collider:getPosition()
         local tankSize = 32
@@ -82,6 +88,10 @@ end
 
 function Player:destroyTank()
     if self:testFlag(TankStateFlag.TSF_SHIELD) then
+        return false
+    end
+    if self:testFlag(TankStateFlag.TSF_BOAT) then
+        self:clearFlag(TankStateFlag.TSF_BOAT) 
         return false
     end
     return Player.super.destroyTank(self)
