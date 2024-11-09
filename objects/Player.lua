@@ -15,6 +15,8 @@ function Player:new(area, x, y, opts)
 
     self.shieldAnim = Anim8.newAnimation( self.grid(31.5, '1-2'), 0.2 )
     self.boatImg    = love.graphics.newQuad(29.5 * 32, 96, 32, 32, Texture_IMG)
+    self.cooldown = 0.25 -- 250 ms
+    self.shootTimer = 0
 end
 
 function Player:draw()
@@ -50,8 +52,9 @@ function Player:update(dt)
             self.speed = 0.0;        
         end
 
-        if input:down('fire', 0.0, 0.25) then 
+        if input:down('fire') and self.shootTimer >= self.cooldown then 
             self:fire()
+            self.shootTimer = 0
         end
 
         if self.speed > 0 then
@@ -64,6 +67,8 @@ function Player:update(dt)
     if self:testFlag(TankStateFlag.TSF_SHIELD) then
         self.shieldAnim:update(dt)
     end
+
+    self.shootTimer = self.shootTimer + dt
 end
 
 function Player:setDirection(_direction)
