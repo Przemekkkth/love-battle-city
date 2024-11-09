@@ -97,6 +97,14 @@ function Player:increaseLevel()
         self.speed = 1.1 * self.speed
     elseif self.level == 2 then
         self.speed = 1.2 * self.speed
-        self.bulletMaxSize = self.bulletMaxSize + 1
+        self:increaseBulletCount()
     end
 end 
+
+function Player:increaseBulletCount()
+    -- max is 5
+    self.bulletMaxSize = self.bulletMaxSize + 1
+    if self.bulletMaxSize >= 5 then
+        self.bulletMaxSize = 5
+    end
+end

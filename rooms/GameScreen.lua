@@ -162,6 +162,7 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                 local bonusCollider = player.collider:getEnterCollisionData('Bonus').collider
                 local bonusObject   = bonusCollider:getObject()
                 if bonusObject then
+                    player:increaseBulletCount()
                     if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
                         self:destroyAllEnemmies()
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
@@ -175,7 +176,7 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
                         player:increaseLevel()
                     elseif bonusObject.type == SpriteType.ST_BONUS_GUN then
-                        print('ST_BONUS_GUN')
+                        player:increaseBulletCount()
                     elseif bonusObject.type == SpriteType.ST_BONUS_BOAT then
                         print('ST_BONUS_BOAT')
                     end
