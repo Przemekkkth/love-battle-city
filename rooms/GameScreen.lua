@@ -171,12 +171,15 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                         player:addShield()
                     elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
                         print('ST_BONUS_CLOCK')
+                        self:frozenAllEnemies()
+                        self.timer:after(TankFrozenTime, function() self:unfrozenAllEnemies() end)
                     elseif bonusObject.type == SpriteType.ST_BONUS_SHOVEL then
                         print('ST_BONUS_SHOVEL')
                     elseif bonusObject.type == SpriteType.ST_BONUS_TANK then
-                        print('ST_BONUS_TANK')
+                        self.playerLives = self.playerLives + 1
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
                         player:increaseLevel()
+                        player:restartAnim()
                     elseif bonusObject.type == SpriteType.ST_BONUS_GUN then
                         player:increaseBulletCount()
                     elseif bonusObject.type == SpriteType.ST_BONUS_BOAT then
@@ -383,5 +386,18 @@ function GameScreen:destroyAllEnemmies()
                 self.timer:after(2, function()  gotoRoom('StartScreen') end)
             end
         end
+    end
+end
+
+function GameScreen:frozenAllEnemies()
+    for i = #self.tanks, 1, -1 do
+        self.tanks[i]:setFlag(TankStateFlag.TSF_FROZEN)
+        self.tanks[i].collider:setLinearVelocity(0, 0)
+    end
+end
+
+function GameScreen:unfrozenAllEnemies()
+    for i = #self.tanks, 1, -1 do
+        self.tanks[i]:clearFlag(TankStateFlag.TSF_FROZEN)
     end
 end

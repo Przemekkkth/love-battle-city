@@ -53,8 +53,8 @@ function Tank:update(dt)
                 self.collider:setLinearVelocity(0, self.speed)
            end
 
-           if self.speed > 0 then
-            self.animation:update(dt)
+           if self.speed > 0 and not self:testFlag(TankStateFlag.TSF_FROZEN) then
+                self.animation:update(dt)
            end
         end
     elseif self:testFlag(TankStateFlag.TSF_CREATE) or self:testFlag(TankStateFlag.TSF_DESTROYED) then
@@ -265,45 +265,6 @@ function Tank:fire()
         end
         table.insert(self.bullets, bullet)
     end
-
-    --[[if(!testFlag(TSF_LIFE)) return nullptr;
-    if(bullets.size() < m_bullet_max_size)
-    {
-        //podajemy początkową dowolną pozycję, bo nie znamy wymiarów pocisku
-        Bullet* bullet = new Bullet(pos_x, pos_y);
-        bullets.push_back(bullet);
-
-        Direction tmp_d = (testFlag(TSF_ON_ICE) ? new_direction : direction);
-        switch(tmp_d)
-        {
-        case D_UP:
-            bullet->pos_x += (dest_rect.w - bullet->dest_rect.w) / 2;
-            bullet->pos_y -= bullet->dest_rect.h - 4;
-            break;
-        case D_RIGHT:
-            bullet->pos_x += dest_rect.w - 4;
-            bullet->pos_y += (dest_rect.h - bullet->dest_rect.h) / 2;
-            break;
-        case D_DOWN:
-            bullet->pos_x += (dest_rect.w - bullet->dest_rect.w) / 2;
-            bullet->pos_y += dest_rect.h - 4;
-            break;
-        case D_LEFT:
-            bullet->pos_x -= bullet->dest_rect.w - 4;
-            bullet->pos_y += (dest_rect.h - bullet->dest_rect.h) / 2;
-            break;
-        }
-
-        bullet->direction = tmp_d;
-        if(type == ST_TANK_C)
-            bullet->speed = AppConfig::bullet_default_speed * 1.3;
-        else
-            bullet->speed = AppConfig::bullet_default_speed;
-
-        bullet->update(0); //zmiana pozycji dest_rect
-        return bullet;
-    }
-    return nullptr;]]
 end
 
 function Tank:checkBulletLive()

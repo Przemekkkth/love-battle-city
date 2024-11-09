@@ -123,3 +123,15 @@ function Player:increaseBulletCount()
         self.bulletMaxSize = 5
     end
 end
+
+function Player:restartAnim()
+    if self.direction == Direction.D_UP then
+        self.animation = self:getAnim().up
+    elseif self.direction == Direction.D_RIGHT then
+        self.animation = self:getAnim().right
+    elseif self.direction == Direction.D_DOWN then
+        self.animation = self:getAnim().down
+    elseif self.direction == Direction.D_LEFT then
+        self.animation = self:getAnim().left
+    end
+end

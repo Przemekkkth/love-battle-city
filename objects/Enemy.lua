@@ -19,6 +19,7 @@ function Enemy:new(area, x, y, opts)
     self.timer = Timer()
     self.collider:setCollisionClass('Enemy')
     self.collider:setObject(self)
+    
 
     if self.type == SpriteType.ST_TANK_B then
         self.defaultSpeed = TankDefaultSpeed * 1.3
