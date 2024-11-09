@@ -29,11 +29,13 @@ function GameScreen:new()
 
     self.isGameOver = false
     self.yGameOverText = 400
+    self.bonuses = {}
     self:loadLevel('assets/levels/1')
 end
 
 function GameScreen:update(dt)
     self:checkCollisionBulletsWithTanks()
+    self:checkCollisionPlayersWithBonuses()
     self:setEnemyTarget()
     self:checkEagle()
     self.area:update(dt)
@@ -96,9 +98,12 @@ function GameScreen:checkCollisionBulletsWithTanks()
             if playerBullet.collider:enter('Enemy') then
                 local enemyCollider = playerBullet.collider:getEnterCollisionData('Enemy').collider
                 local enemyObject   = enemyCollider:getObject()
-                if enemyObject then 
-                    
+                if enemyObject then                     
                     playerBullet:destroy()
+                    if enemyObject:testFlag(TankStateFlag.TSF_BONUS) then
+                        self:generateBonus()
+                        enemyObject:clearFlag(TankStateFlag.TSF_BONUS)
+                    end
 
                     if enemyObject:destroyTank() then
                         self.enemyToKill = self.enemyToKill - 1
@@ -148,6 +153,44 @@ function GameScreen:checkCollisionBulletsWithTanks()
     end
 end
 
+function GameScreen:checkCollisionPlayersWithBonuses()
+    for _, player in ipairs(self.players) do
+        for _, bonus in ipairs(self.bonuses) do
+            if player.collider:enter('Bonus') then
+                local bonusCollider = player.collider:getEnterCollisionData('Bonus').collider
+                local bonusObject   = bonusCollider:getObject()
+                if bonusObject then
+                    if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
+                        print('ST_BONUS_GRENADE')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
+                        print('ST_BONUS_HELMET')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
+                        print('ST_BONUS_CLOCK')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_SHOVEL then
+                        print('ST_BONUS_SHOVEL')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_TANK then
+                        print('ST_BONUS_TANK')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
+                        print('ST_BONUS_STAR')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_GUN then
+                        print('ST_BONUS_GUN')
+                    elseif bonusObject.type == SpriteType.ST_BONUS_BOAT then
+                        print('ST_BONUS_BOAT')
+                    end
+
+                    bonusObject:destroy()
+                    for i, bonus_ in ipairs(self.bonuses) do
+                        if bonus_ == bonusObject then
+                            table.remove(self.bonuses, i)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 function GameScreen:drawStatisticsRect()
     love.graphics.setColor(110/255, 110/255, 110/255)
     love.graphics.rectangle('fill', StatusRect.x, StatusRect.y, StatusRect.w, StatusRect.h )
@@ -163,6 +206,8 @@ function GameScreen:initCollisionClass()
     world:addCollisionClass('Player', {ignores = {'PlayerBullet'}})
     world:addCollisionClass('Enemy', {ignores = {'EnemyBullet'}})
     world:addCollisionClass('StoneWall')
+    world:addCollisionClass('Bonus', {ignores = {'Brick', 'PlayerBullet', 'EnemyBullet', 'Enemy', 'StoneWall'}})
+    
 end
 
 function GameScreen:initBoundary()
@@ -261,6 +306,18 @@ function GameScreen:generateEnemy()
     self.enemyField = self.enemyField + 1
     self.enemyField = (self.enemyField % 3) + 1
     table.insert(self.tanks, enemy)
+end
+
+function GameScreen:generateBonus()
+    local spriteTypes = { SpriteType.ST_BONUS_GRENADE, SpriteType.ST_BONUS_HELMET, SpriteType.ST_BONUS_CLOCK, 
+                          SpriteType.ST_BONUS_SHOVEL, SpriteType.ST_BONUS_TANK, SpriteType.ST_BONUS_STAR, 
+                          SpriteType.ST_BONUS_GUN, SpriteType.ST_BONUS_BOAT}
+    local bonusSize = 32
+    local padding = 10
+    local xPos = math.random(padding, MapRect.w - bonusSize - padding)
+    local yPos = math.random(padding, MapRect.h - 2 * bonusSize - padding) -- 2* to avoid the eagle
+    local spriteIdx = spriteTypes[math.random(1, 8)]
+    table.insert(self.bonuses, self.area:addGameObject('Bonus', xPos, yPos, {type = spriteIdx}) )
 end
 
 function GameScreen:setEnemyTarget()
