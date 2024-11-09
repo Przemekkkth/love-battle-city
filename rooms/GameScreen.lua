@@ -1,6 +1,7 @@
 GameScreen = Object:extend()
 
 function GameScreen:new()
+    self.timer = Timer()
     world = wf.newWorld(0, 0, true)
     self:initCollisionClass() 
     self:initBoundary()
@@ -16,6 +17,7 @@ function GameScreen:new()
     self:generateEnemy()
     self:generateEnemy()
     self:generateEnemy()
+    
 
     self.enemyStatisticsMarker = {}
     self.enemyToKill = 6
@@ -40,6 +42,7 @@ function GameScreen:update(dt)
     self:checkEagle()
     self.area:update(dt)
     world:update(dt)
+    self.timer:update(dt)
 end
 
 function GameScreen:draw()
@@ -120,7 +123,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                         if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
                             self:generateEnemy()
                         elseif self.enemyToKill == 0 then
-                            timer:after(2, function()  gotoRoom('StartScreen') end)
+                            self.timer:after(2, function()  gotoRoom('StartScreen') end)
                         end
                     end
                     break 
@@ -141,7 +144,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     end
                     self.playerLives = self.playerLives - 1
                     if self.playerLives > 0 then
-                        timer:after(1, function() 
+                        self.timer:after(1, function() 
                             self.player = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[2][1], {type = SpriteType.ST_PLAYER_1})
                             table.insert(self.players, self.player)
                         end)
@@ -162,7 +165,6 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                 local bonusCollider = player.collider:getEnterCollisionData('Bonus').collider
                 local bonusObject   = bonusCollider:getObject()
                 if bonusObject then
-                    player:setFlag(TankStateFlag.TSF_BOAT)
                     if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
                         self:destroyAllEnemmies()
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
@@ -257,8 +259,8 @@ end
 
 function GameScreen:setGameOver()
     self.isGameOver = true
-    timer:tween(2.5, self, {yGameOverText = 200}, 'in-out-quad')
-    timer:after(3.0, function()  gotoRoom('MenuScreen') end)
+    self.timer:tween(2.5, self, {yGameOverText = 200}, 'in-out-quad')
+    self.timer:after(3.0, function()  gotoRoom('MenuScreen') end)
 end
 
 function GameScreen:generateEnemy()
@@ -378,7 +380,7 @@ function GameScreen:destroyAllEnemmies()
             if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
                 self:generateEnemy()
             elseif self.enemyToKill == 0 then
-                timer:after(2, function()  gotoRoom('StartScreen') end)
+                self.timer:after(2, function()  gotoRoom('StartScreen') end)
             end
         end
     end
