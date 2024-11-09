@@ -19,7 +19,7 @@ function Enemy:new(area, x, y, opts)
     self.timer = Timer()
     self.collider:setCollisionClass('Enemy')
     self.collider:setObject(self)
-    
+
 
     if self.type == SpriteType.ST_TANK_B then
         self.defaultSpeed = TankDefaultSpeed * 1.3
@@ -36,33 +36,11 @@ end
 
 function Enemy:update(dt)
     Enemy.super.update(self, dt)
-    if self:testFlag(TankStateFlag.TSF_LIFE) then
-        if self:testFlag(TankStateFlag.TSF_BONUS) then 
-
-        end
-    end
---[[
-        if(testFlag(TSF_LIFE))
-    {
-        if(testFlag(TSF_BONUS))
-            src_rect = moveRect(m_sprite->rect, (testFlag(TSF_ON_ICE) ? new_direction : direction) - 4, m_current_frame);
-        else
-            src_rect = moveRect(m_sprite->rect, (testFlag(TSF_ON_ICE) ? new_direction : direction) + (lives_count -1) * 4, m_current_frame);
-    }
-    else
-        src_rect = moveRect(m_sprite->rect, 0, m_current_frame);
-
-    if(testFlag(TSF_FROZEN)) return;
-]]
-    if self:testFlag(TankStateFlag.TSF_FROZEN) then
-        return
-    end
-
     self.timer:update(dt)
 end
 
 function Enemy:draw()
---[[    if(to_erase) return;
+--[[
     if(AppConfig::show_enemy_target)
     {
         SDL_Color c;
