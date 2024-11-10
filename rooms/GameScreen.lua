@@ -51,6 +51,7 @@ function GameScreen:new()
     self.isGameOver = false
     self.yGameOverText = 400
     self.bonuses = {}
+    self.bushes = {}
     self:loadLevel('assets/levels/'..GameData.level)
 
     self.eagleWallData = {
@@ -64,6 +65,7 @@ function GameScreen:new()
         {x = 14, y = 25},
     }
     self.eagleWall = {}
+    
     self:genrateEagleWall()
 end
 
@@ -76,12 +78,8 @@ function GameScreen:update(dt)
     world:update(dt)
     self.timer:update(dt)
 
-    for i = #self.eagleWall, 1, -1 do
-        if self.eagleWall[i].toErase then
-            table.remove(self.eagleWall, i)
-        end
-    end
-
+    self:checkEagleWall()
+    self:checkBushes()
     self:handlePlayerInput()
 end
 
@@ -97,12 +95,15 @@ function GameScreen:draw()
     love.graphics.setFont(Font2)
     love.graphics.print(GameData.level, StatusRect.x + 24, 242)
     love.graphics.setColor(1, 1, 1)
+    self:drawBushes()
+
     if self.isGameOver then
         love.graphics.setFont(Font1)
         love.graphics.setColor(1, 0, 0)
         love.graphics.print('Game Over', SCREEN_WIDTH / 2, self.yGameOverText, 0, 1, 1, love.graphics.getFont():getWidth('Game Over') / 2 )
         love.graphics.setColor(1, 1, 1)
     end
+
     world:draw()
 end
 
@@ -126,7 +127,7 @@ function GameScreen:loadLevel(path)
             elseif char == "@" then
                 self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_STONE_WALL})
             elseif char == "%" then
-                self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_BUSH})
+                table.insert(self.bushes, self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_BUSH}) )
             elseif char == "~" then
                 self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_WATER})
             elseif char == "-" then
@@ -309,6 +310,7 @@ function GameScreen:initCollisionClass()
     world:addCollisionClass('Enemy', {ignores = {'EnemyBullet'}})
     world:addCollisionClass('StoneWall')
     world:addCollisionClass('Bonus', {ignores = {'Brick', 'PlayerBullet', 'EnemyBullet', 'Enemy', 'StoneWall'}})
+    world:addCollisionClass('Bush', {ignores = {'Player', 'PlayerBullet', 'EnemyBullet', 'Enemy'}})
     
 end
 
@@ -562,5 +564,27 @@ function GameScreen:handlePlayerInput()
         self:goToNextLevel()
     elseif input:released('goToPreviousLevel') then
         self:goToPreviousLevel()
+    end
+end
+
+function GameScreen:drawBushes()
+    for i = #self.bushes, 1, -1 do
+        self.bushes[i]:draw()
+    end
+end
+
+function GameScreen:checkBushes()
+    for i = #self.bushes, 1, -1 do
+        if self.bushes[i].toErase then
+            table.remove(self.bushes, i)
+        end
+    end
+end
+
+function GameScreen:checkEagleWall()
+    for i = #self.eagleWall, 1, -1 do
+        if self.eagleWall[i].toErase then
+            table.remove(self.eagleWall, i)
+        end
     end
 end

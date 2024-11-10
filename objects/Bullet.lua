@@ -69,7 +69,28 @@ function Bullet:update(dt)
         end
 
         if self.collider:enter('StoneWall') then
+            if self.speed > 1.25 * BulletDefaultSpeed then
+                local bushCollider = self.collider:getEnterCollisionData('StoneWall').collider
+                local bushObject   = bushCollider:getObject()
+                if bushObject then
+
+                    bushObject.toErase = true
+                    bushObject.collider:destroy()
+                end
+            end
             self:destroy()
+        end
+
+        if self.collider:enter('Bush') then
+            if self.speed > 1.25 * BulletDefaultSpeed then
+                local bushCollider = self.collider:getEnterCollisionData('Bush').collider
+                local bushObject   = bushCollider:getObject()
+                if bushObject then
+                    bushObject.toErase = true
+                    bushObject.collider:destroy()
+                    self:destroy()
+                end
+            end
         end
     else
         self.animation:update(dt)
