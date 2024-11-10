@@ -1,8 +1,7 @@
 StartScreen = Object:extend()
 
 function StartScreen:new()
-    
-    self.text = "Stage "..currentLevel
+    self.text = "Stage "..GameData.level
     timer:after(2, function() gotoRoom('GameScreen') end)
     audio.startSFX:play()
 end

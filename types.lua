@@ -40,8 +40,9 @@ SpriteType = {
 
     ST_TANKS_LOGO = 32,
     ST_TANK_LIFE_LOGO = 33,
-
-    ST_NONE = 34
+    ST_TANK_LIFE_LOGO_1 = 34,
+    
+    ST_NONE = 35
 }
 
 TankStateFlag = {

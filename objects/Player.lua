@@ -135,3 +135,16 @@ function Player:restartAnim()
         self.animation = self:getAnim().left
     end
 end
+
+function Player:setLevel(level)
+    if level == 1 then
+        self:increaseLevel()
+    elseif level == 2 then
+        self:increaseLevel()
+        self:increaseLevel()
+    elseif level == 3 then
+        self:increaseLevel()
+        self:increaseLevel()
+        self:increaseLevel()
+    end
+end

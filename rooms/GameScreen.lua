@@ -7,9 +7,24 @@ function GameScreen:new()
     self:initBoundary()
 
     self.area = Area(self)
-    self.player = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[1][2], {type = SpriteType.ST_PLAYER_1})
+
     self.players = {}
-    table.insert(self.players, self.player)
+    self.player1 = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[1][2], {type = SpriteType.ST_PLAYER_1})
+    self.player1:setLevel(Player1Data.level)
+    if Player1Data.boat then 
+        self.player1:setFlag(TankStateFlag.TSF_BOAT)
+    end
+    table.insert(self.players, self.player1)
+    if GameData.mode == '2-Players' then
+        self.player2 = self.area:addGameObject('Player', PlayerStartingPoints[2][1], PlayerStartingPoints[2][2], {type = SpriteType.ST_PLAYER_2})
+        self.player2:setLevel(Player2Data.level)
+        if Player2Data.boat then 
+            self.player2:setFlag(TankStateFlag.TSF_BOAT)
+        end
+        table.insert(self.players, self.player2)
+    end
+
+    
     self.eagle = self.area:addGameObject('Eagle', 12*16, 384, {type = SpriteType.ST_EAGLE})
 
     self.tanks = {}
@@ -21,12 +36,16 @@ function GameScreen:new()
 
     self.enemyStatisticsMarker = {}
     self.enemyToKill = 6
-    self.playerLives = 1
+    self.player1Lives = Player1Data.lives
+    self.player2Lives = Player2Data.lives
     for i = 0, self.enemyToKill-1 do
         table.insert(self.enemyStatisticsMarker, self.area:addGameObject('Entity', StatusRect.x + 8 + 16 * (i%2), 5 + 16 * math.floor(i / 2), {type = SpriteType.ST_LEFT_ENEMY}))
     end
 
     self.area:addGameObject('Entity', StatusRect.x + 5, 180, {type = SpriteType.ST_TANK_LIFE_LOGO})
+    if GameData.mode == '2-Players' then
+        self.area:addGameObject('Entity', StatusRect.x + 5, 200, {type = SpriteType.ST_TANK_LIFE_LOGO_1})  
+    end
     self.area:addGameObject('Entity', StatusRect.x + 8, 220, {type = SpriteType.ST_STAGE_STATUS})
 
     self.isGameOver = false
@@ -69,9 +88,12 @@ function GameScreen:draw()
     self.area:draw()
     love.graphics.setColor(0, 0, 0)
     love.graphics.setFont(Font3)
-    love.graphics.print(self.playerLives, StatusRect.x + 34, 183)
+    love.graphics.print(self.player1Lives, StatusRect.x + 34, 183)
+    if GameData.mode == '2-Players' then
+        love.graphics.print(self.player2Lives, StatusRect.x + 34, 203)
+    end
     love.graphics.setFont(Font2)
-    love.graphics.print(self.playerLives, StatusRect.x + 24, 242)
+    love.graphics.print(GameData.level, StatusRect.x + 24, 242)
     love.graphics.setColor(1, 1, 1)
     if self.isGameOver then
         love.graphics.setFont(Font1)
@@ -140,7 +162,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                         if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
                             self:generateEnemy()
                         elseif self.enemyToKill == 0 then
-                            self.timer:after(2, function()  gotoRoom('StartScreen') end)
+                            self:goToNextLevel()
                         end
                     end
                     break 
@@ -159,16 +181,63 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     if not playerObject:destroyTank() then
                         break
                     end
-                    self.playerLives = self.playerLives - 1
-                    if self.playerLives > 0 then
-                        self.timer:after(1, function() 
-                            self.player = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[2][1], {type = SpriteType.ST_PLAYER_1})
-                            table.insert(self.players, self.player)
-                        end)
-                    else
-                        self:setGameOver()
-                    end
-                    break 
+                    if GameData.mode == '1-Player' then
+                        if playerObject.type == SpriteType.ST_PLAYER_1 then
+                            self.player1Lives = self.player1Lives - 1
+                            Player1Data.lives = self.player1Lives
+                            if self.player1Lives > 0 then
+                                self.timer:after(1, function() 
+                                    self.player1 = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[1][2], {type = SpriteType.ST_PLAYER_1})
+                                    self.player1:setLevel(Player1Data.level)
+                                    if Player1Data.boat then 
+                                        self.player1:setFlag(TankStateFlag.TSF_BOAT)
+                                    end
+                                    table.insert(self.players, self.player1)
+                                end)
+                            else
+                                self:setGameOver()
+                            end
+                            break
+                        end
+                    else 
+                        if playerObject.type == SpriteType.ST_PLAYER_1 then
+                            self.player1Lives = self.player1Lives - 1
+                            Player1Data.lives = self.player1Lives
+                            if self.player1Lives > 0 then
+                                self.timer:after(1, function() 
+                                    self.player1 = self.area:addGameObject('Player', PlayerStartingPoints[1][1], PlayerStartingPoints[1][2], {type = SpriteType.ST_PLAYER_1})
+                                    self.player1:setLevel(Player1Data.level)
+                                    if Player1Data.boat then 
+                                        self.player1:setFlag(TankStateFlag.TSF_BOAT)
+                                    end
+                                    table.insert(self.players, self.player1)
+                                end)
+                            else
+                                if self.player1Lives <= 0 and self.player2Lives <= 0 then
+                                    self:setGameOver()
+                                end
+                            end
+                            break
+                        else
+                            self.player2Lives = self.player2Lives - 1
+                            Player2Data.lives = self.player2Lives
+                            if self.player2Lives > 0 then
+                                self.timer:after(1, function() 
+                                    self.player2 = self.area:addGameObject('Player', PlayerStartingPoints[2][1], PlayerStartingPoints[2][2], {type = SpriteType.ST_PLAYER_2})
+                                    self.player2:setLevel(Player2Data.level)
+                                    if Player2Data.boat then 
+                                        self.player2:setFlag(TankStateFlag.TSF_BOAT)
+                                    end
+                                    table.insert(self.players, self.player2)
+                                end)
+                            else
+                                if self.player1Lives <= 0 and self.player2Lives <= 0 then
+                                    self:setGameOver()
+                                end
+                            end
+                            break                        
+                        end
+                    end 
                 end
             end
         end
@@ -193,7 +262,13 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                         self:generateUpgradedEagleWall()
                         self.timer:after(ProtectEagleTime, function() self:genrateEagleWall() end)
                     elseif bonusObject.type == SpriteType.ST_BONUS_TANK then
-                        self.playerLives = self.playerLives + 1
+                        if player.type == SpriteType.ST_PLAYER_1 then
+                            self.player1Lives = self.player1Lives + 1
+                            Player1Data.lives = self.player1Lives
+                        elseif player.type == SpriteType.ST_PLAYER_2 then
+                            self.player2Lives = self.player2Lives + 1
+                            Player2Data.lives = self.player2Lives
+                        end
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
                         player:increaseLevel()
                         player:restartAnim()
@@ -400,7 +475,7 @@ function GameScreen:destroyAllEnemmies()
             if self.enemyToKill > 0 and #self.tanks < self.enemyToKill then
                 self:generateEnemy()
             elseif self.enemyToKill == 0 then
-                self.timer:after(2, function()  gotoRoom('StartScreen') end)
+                self:goToNextLevel()
             end
         end
     end
@@ -446,4 +521,17 @@ function GameScreen:generateUpgradedEagleWall()
         local brick = self.area:addGameObject('Entity', data.x * tileSize, data.y * tileSize, {type = SpriteType.ST_STONE_WALL})
         table.insert(self.eagleWall, brick)
     end
+end
+
+function GameScreen:goToNextLevel()
+    Player1Data.lives = self.player1Lives
+    Player1Data.level = self.player1.level
+    Player1Data.boat = self.player1:testFlag(TankStateFlag.TSF_BOAT)
+    if GameData.mode == '2-Players' then
+        Player2Data.lives = self.player2Lives
+        Player2Data.level = self.player2.level
+        Player2Data.boat = self.player2:testFlag(TankStateFlag.TSF_BOAT)
+    end
+    GameData.level = GameData.level + 1
+    self.timer:after(2, function()  gotoRoom('StartScreen') end)
 end

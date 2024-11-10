@@ -51,6 +51,7 @@ insert(SpriteType.ST_EAGLE, 944, 0, 32, 32, 1, 200, false);
 insert(SpriteType.ST_DESTROY_EAGLE, 1040, 0, 64, 64, 7, 100, false);
 insert(SpriteType.ST_FLAG, 944, 32, 32, 32, 1, 200, false);
 insert(SpriteType.ST_TANK_LIFE_LOGO, 944, 64, 16, 16, 1, 200, false);
+insert(SpriteType.ST_TANK_LIFE_LOGO_1, 944, 80, 16, 16, 1, 200, false);
 
 insert(SpriteType.ST_BULLET, 944, 128, 8, 8, 1, 200, false);
 

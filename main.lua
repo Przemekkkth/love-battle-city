@@ -14,6 +14,10 @@ function love.load()
     Font2 = love.graphics.newFont('assets/font/prstartk.ttf', 14)
     Font3 = love.graphics.newFont('assets/font/prstartk.ttf', 10)
 
+    GameData = {level = 1, mode = ''}
+    Player1Data = {level = 0, boat = false, lives = 3}
+    Player2Data = {level = 0, boat = false, lives = 3}
+
     currentLevel = 0
     isLeftHalfClicked = false
     tiles = {}

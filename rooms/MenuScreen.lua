@@ -33,7 +33,20 @@ function MenuScreen:update(dt)
         if self.currentIndex == 2 then
             love.event.quit()
         elseif self.currentIndex == 0 then
+            GameData.mode = '1-Player'
             gotoRoom('StartScreen')
+            Player1Data.level = 0
+            Player1Data.boat = false
+            Player1Data.lives = 3
+        elseif self.currentIndex == 1 then
+            GameData.mode = '2-Players'
+            gotoRoom('StartScreen')
+            Player1Data.level = 0
+            Player1Data.boat = false
+            Player1Data.lives = 3
+            Player2Data.level = 0
+            Player2Data.boat = false
+            Player2Data.lives = 3 
         end
     end
 
