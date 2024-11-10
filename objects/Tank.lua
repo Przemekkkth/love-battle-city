@@ -263,6 +263,21 @@ function Tank:fire()
         elseif tankDir == Direction.D_LEFT then
             bullet = self.area:addGameObject('Bullet', xPos - tankSize / 2 - bulletSize / 2, yPos - bulletSize / 2, {direction = tankDir, type = SpriteType.ST_BULLET, collisionClass = collisionClassName})
         end
+
+        if self.type == SpriteType.ST_PLAYER_1 or self.type == SpriteType.ST_PLAYER_2 then
+            if self.level == 1 then
+                bullet.speed = 1.1 * bullet.speed
+            elseif self.level == 2 then
+                bullet.speed = 1.2 * bullet.speed
+            elseif self.level == 3 then
+                bullet.speed = 1.3 * bullet.speed
+            end
+        elseif self.type == SpriteType.ST_TANK_B then 
+            bullet.speed = 1.1 * bullet.speed
+        elseif self.type == SpriteType.ST_TANK_C or self.type == SpriteType.ST_TANK_D then
+            bullet.speed = 1.2 * bullet.speed 
+        end
+
         table.insert(self.bullets, bullet)
     end
 end
@@ -301,6 +316,11 @@ function Tank:destroyTank()
         timer:after(7*self.sprite.frameDuration, function() 
             self.toErase = true 
         end)
+        for i = #self.bullets, 1, -1 do
+            self.bullets[i]:destroy()
+            table.remove(self.bullets, i)
+        end
+
         return true
     else
         if self.direction == Direction.D_UP then
