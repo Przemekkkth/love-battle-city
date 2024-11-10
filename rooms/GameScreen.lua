@@ -51,7 +51,7 @@ function GameScreen:new()
     self.isGameOver = false
     self.yGameOverText = 400
     self.bonuses = {}
-    self:loadLevel('assets/levels/1')
+    self:loadLevel('assets/levels/'..GameData.level)
 
     self.eagleWallData = {
         {x = 11, y = 25},
@@ -81,6 +81,8 @@ function GameScreen:update(dt)
             table.remove(self.eagleWall, i)
         end
     end
+
+    self:handlePlayerInput()
 end
 
 function GameScreen:draw()
@@ -533,5 +535,32 @@ function GameScreen:goToNextLevel()
         Player2Data.boat = self.player2:testFlag(TankStateFlag.TSF_BOAT)
     end
     GameData.level = GameData.level + 1
+    if GameData.level >= 35 then
+        GameData.level = 35
+    end
     self.timer:after(2, function()  gotoRoom('StartScreen') end)
+end
+
+function GameScreen:goToPreviousLevel()
+    Player1Data.lives = self.player1Lives
+    Player1Data.level = self.player1.level
+    Player1Data.boat = self.player1:testFlag(TankStateFlag.TSF_BOAT)
+    if GameData.mode == '2-Players' then
+        Player2Data.lives = self.player2Lives
+        Player2Data.level = self.player2.level
+        Player2Data.boat = self.player2:testFlag(TankStateFlag.TSF_BOAT)
+    end
+    GameData.level = GameData.level - 1
+    if GameData.level <= 1 then
+        GameData.level = 1
+    end
+    self.timer:after(2, function()  gotoRoom('StartScreen') end)
+end
+
+function GameScreen:handlePlayerInput()
+    if input:released('goToNextLevel') then
+        self:goToNextLevel()
+    elseif input:released('goToPreviousLevel') then
+        self:goToPreviousLevel()
+    end
 end

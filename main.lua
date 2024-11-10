@@ -40,6 +40,9 @@ function love.load()
     input:bind('s', 'player2_down')
     input:bind('g', 'player2_fire')
 
+    input:bind('n', 'goToNextLevel')
+    input:bind('p', 'goToPreviousLevel')
+
     input:bind('mouse1', 'leftButton')
     input:bind('p', 'p')
     input:bind('backspace', 'backspace')
