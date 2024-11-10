@@ -14,7 +14,11 @@ function Player:new(area, x, y, opts)
     end
 
     self.shieldAnim = Anim8.newAnimation( self.grid(31.5, '1-2'), 0.2 )
-    self.boatImg    = love.graphics.newQuad(29.5 * 32, 96, 32, 32, Texture_IMG)
+    if self.type == SpriteType.ST_PLAYER_1 then
+        self.boatImg    = love.graphics.newQuad(29.5 * 32, 96, 32, 32, Texture_IMG)
+    else
+        self.boatImg    = love.graphics.newQuad(30.5 * 32, 96, 32, 32, Texture_IMG)
+    end
     self.cooldown = 0.25 -- 250 ms
     self.shootTimer = 0
 end
@@ -36,23 +40,24 @@ end
 function Player:update(dt)
     Player.super.update(self, dt)
     if not self:testFlag(TankStateFlag.TSF_MENU) and not self:testFlag(TankStateFlag.TSF_CREATE) and not self.pointer and not self.stop then
-        if input:down('up_arrow') then
+        local playerName = (self.type == SpriteType.ST_PLAYER_1) and 'player1' or 'player2'
+        if input:down(playerName..'_up') then
             self:setDirection(Direction.D_UP)
             self.speed = self.defaultSpeed
-        elseif input:down('left_arrow') then
+        elseif input:down(playerName..'_left') then
             self:setDirection(Direction.D_LEFT)
             self.speed = self.defaultSpeed
-        elseif input:down('right_arrow') then
+        elseif input:down(playerName..'_right') then
             self:setDirection(Direction.D_RIGHT)
             self.speed = self.defaultSpeed
-        elseif input:down('down_arrow') then
+        elseif input:down(playerName..'_down') then
             self:setDirection(Direction.D_DOWN)
             self.speed = self.defaultSpeed
         else
             self.speed = 0.0;        
         end
 
-        if input:down('fire') and self.shootTimer >= self.cooldown then 
+        if input:down(playerName..'_fire') and self.shootTimer >= self.cooldown then 
             self:fire()
             self.shootTimer = 0
         end
