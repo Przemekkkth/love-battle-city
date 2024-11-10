@@ -33,6 +33,19 @@ function GameScreen:new()
     self.yGameOverText = 400
     self.bonuses = {}
     self:loadLevel('assets/levels/1')
+
+    self.eagleWallData = {
+        {x = 11, y = 25},
+        {x = 11, y = 24},
+        {x = 11, y = 23},
+        {x = 12, y = 23},
+        {x = 13, y = 23},
+        {x = 14, y = 23},
+        {x = 14, y = 24},
+        {x = 14, y = 25},
+    }
+    self.eagleWall = {}
+    self:genrateEagleWall()
 end
 
 function GameScreen:update(dt)
@@ -43,6 +56,12 @@ function GameScreen:update(dt)
     self.area:update(dt)
     world:update(dt)
     self.timer:update(dt)
+
+    for i = #self.eagleWall, 1, -1 do
+        if self.eagleWall[i].toErase then
+            table.remove(self.eagleWall, i)
+        end
+    end
 end
 
 function GameScreen:draw()
@@ -60,12 +79,11 @@ function GameScreen:draw()
         love.graphics.print('Game Over', SCREEN_WIDTH / 2, self.yGameOverText, 0, 1, 1, love.graphics.getFont():getWidth('Game Over') / 2 )
         love.graphics.setColor(1, 1, 1)
     end
-    --world:draw()
+    world:draw()
 end
 
 function GameScreen:loadLevel(path)
     m_level = {}
-    staticBodies = {}
     local file = love.filesystem.read(path)
     local j = -1
 
@@ -80,10 +98,9 @@ function GameScreen:loadLevel(path)
             local y = j * tileSize
 
             if char == "#" then
-                obj = self.area:addGameObject('Brick', x, y, {type = SpriteType.ST_BRICK_WALL})
-                table.insert(staticBodies, obj)
+                self.area:addGameObject('Brick', x, y, {type = SpriteType.ST_BRICK_WALL})
             elseif char == "@" then
-                table.insert(staticBodies, self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_STONE_WALL}) )
+                self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_STONE_WALL})
             elseif char == "%" then
                 self.area:addGameObject('Entity', x, y, {type = SpriteType.ST_BUSH})
             elseif char == "~" then
@@ -170,11 +187,11 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
                         player:addShield()
                     elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
-                        print('ST_BONUS_CLOCK')
                         self:frozenAllEnemies()
                         self.timer:after(TankFrozenTime, function() self:unfrozenAllEnemies() end)
                     elseif bonusObject.type == SpriteType.ST_BONUS_SHOVEL then
-                        print('ST_BONUS_SHOVEL')
+                        self:generateUpgradedEagleWall()
+                        self.timer:after(ProtectEagleTime, function() self:genrateEagleWall() end)
                     elseif bonusObject.type == SpriteType.ST_BONUS_TANK then
                         self.playerLives = self.playerLives + 1
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
@@ -399,5 +416,34 @@ end
 function GameScreen:unfrozenAllEnemies()
     for i = #self.tanks, 1, -1 do
         self.tanks[i]:clearFlag(TankStateFlag.TSF_FROZEN)
+    end
+end
+
+function GameScreen:degenerateEagleWall()
+    for i = #self.eagleWall, 1, -1 do
+        if self.eagleWall[i].collider then
+            self.eagleWall[i].collider:destroy()
+        end
+        self.eagleWall[i].toErase = true
+        table.remove(self.eagleWall, i)
+    end
+    self.eagleWall = {}
+end
+
+function GameScreen:genrateEagleWall()
+    self:degenerateEagleWall()
+    for _, data in ipairs(self.eagleWallData) do
+        local tileSize = 16
+        local brick = self.area:addGameObject('Brick', data.x * tileSize, data.y * tileSize, {type = SpriteType.ST_BRICK_WALL})
+        table.insert(self.eagleWall, brick)
+    end
+end
+
+function GameScreen:generateUpgradedEagleWall()
+    self:degenerateEagleWall()
+    for _, data in ipairs(self.eagleWallData) do
+        local tileSize = 16
+        local brick = self.area:addGameObject('Entity', data.x * tileSize, data.y * tileSize, {type = SpriteType.ST_STONE_WALL})
+        table.insert(self.eagleWall, brick)
     end
 end

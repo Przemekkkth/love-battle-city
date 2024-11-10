@@ -14,7 +14,7 @@ BonusShowTime = 7.0
 TankShieldTime = 4.0
 TankFrozenTime = 4.0
 LevelEndTime = 5.0
-ProtectEagleTime = 10.0
+ProtectEagleTime = 6.5
 BonusBlinkTime = 0.35
 PlayerReloadTime = 0.12
 
