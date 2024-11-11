@@ -104,7 +104,7 @@ function GameScreen:draw()
         love.graphics.setColor(1, 1, 1)
     end
 
-    world:draw()
+    --world:draw()
 end
 
 function GameScreen:loadLevel(path)

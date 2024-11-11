@@ -1,5 +1,5 @@
 Texture_IMG = love.graphics.newImage('assets/sprite/texture.png')
-
+LOGO_IMG = love.graphics.newImage('assets/sprite/love_app_icon.png')
 spriteData = {}
 
 local function insert(type, x, y, w, h, frameCount, frameDuration, loop)

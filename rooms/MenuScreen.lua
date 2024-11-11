@@ -67,5 +67,6 @@ function MenuScreen:draw()
     love.graphics.print('1 Player', 180, 152)
     love.graphics.print('2 Players', 180, 184)
     love.graphics.print('Exit', 180, 216)
+    love.graphics.draw(LOGO_IMG, SCREEN_WIDTH / 2, 280, 0, 1, 1, LOGO_IMG:getWidth() / 2)
     self.area:draw()
 end
