@@ -241,6 +241,8 @@ function Tank:fire()
     end
 
     if #self.bullets < self.bulletMaxSize then
+        audio.shootSFX:stop()
+        audio.shootSFX:play()
         local tankDir = (self:testFlag(TankStateFlag.TSF_ON_ICE) and self.new_direction or self.direction)
         local xPos, yPos = self.collider:getPosition()
 
@@ -320,7 +322,8 @@ function Tank:destroyTank()
             self.bullets[i]:destroy()
             table.remove(self.bullets, i)
         end
-
+        audio.crashSFX:stop()
+        audio.crashSFX:play()
         return true
     else
         if self.direction == Direction.D_UP then

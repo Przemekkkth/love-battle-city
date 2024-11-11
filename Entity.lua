@@ -23,9 +23,14 @@ function Entity:new(area, x, y, opts)
     if self.type == SpriteType.ST_STONE_WALL then
         self.collider:setType('static')
         self.collider:setCollisionClass('StoneWall')
+        self.collider:setRestitution(0.2) 
     elseif self.type == SpriteType.ST_BUSH then
         self.collider:setType('static')
         self.collider:setCollisionClass('Bush')
+    elseif self.type == SpriteType.ST_WATER then
+        self.collider:setType('static')
+        self.collider:setCollisionClass('Water')
+        self.collider:setRestitution(0.2) 
     end
     self.collider:setObject(self)
 end

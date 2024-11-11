@@ -151,6 +151,7 @@ function GameScreen:checkCollisionBulletsWithTanks()
                     end
 
                     if enemyObject:destroyTank() then
+                        audio.crashSFX:play()
                         self.enemyToKill = self.enemyToKill - 1
                         self.enemyStatisticsMarker[#self.enemyStatisticsMarker].toErase = true
                         table.remove(self.enemyStatisticsMarker, #self.enemyStatisticsMarker)
@@ -256,10 +257,13 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                 if bonusObject then
                     if bonusObject.type == SpriteType.ST_BONUS_GRENADE then
                         self:destroyAllEnemmies()
+                        audio.bonusSFX:play()
                     elseif bonusObject.type == SpriteType.ST_BONUS_HELMET then
                         player:addShield()
+                        audio.bonusSFX:play()
                     elseif bonusObject.type == SpriteType.ST_BONUS_CLOCK then
                         self:frozenAllEnemies()
+                        audio.bonusSFX:play()
                         self.timer:after(TankFrozenTime, function() self:unfrozenAllEnemies() end)
                     elseif bonusObject.type == SpriteType.ST_BONUS_SHOVEL then
                         self:generateUpgradedEagleWall()
@@ -272,13 +276,17 @@ function GameScreen:checkCollisionPlayersWithBonuses()
                             self.player2Lives = self.player2Lives + 1
                             Player2Data.lives = self.player2Lives
                         end
+                        audio.lifeSFX:play()
                     elseif bonusObject.type == SpriteType.ST_BONUS_STAR then
                         player:increaseLevel()
                         player:restartAnim()
+                        audio.levelSFX:play()
                     elseif bonusObject.type == SpriteType.ST_BONUS_GUN then
                         player:increaseBulletCount()
+                        audio.bonusSFX:play()
                     elseif bonusObject.type == SpriteType.ST_BONUS_BOAT then
                         player:setFlag(TankStateFlag.TSF_BOAT)
+                        audio.bonusSFX:play()
                     end
 
                     bonusObject:destroy()
@@ -311,7 +319,7 @@ function GameScreen:initCollisionClass()
     world:addCollisionClass('StoneWall')
     world:addCollisionClass('Bonus', {ignores = {'Brick', 'PlayerBullet', 'EnemyBullet', 'Enemy', 'StoneWall'}})
     world:addCollisionClass('Bush', {ignores = {'Player', 'PlayerBullet', 'EnemyBullet', 'Enemy'}})
-    
+    world:addCollisionClass('Water', {ignores = {'PlayerBullet', 'EnemyBullet'}})
 end
 
 function GameScreen:initBoundary()

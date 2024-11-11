@@ -12,7 +12,9 @@ function Brick:new(area, x, y, opts)
 end
 
 function Brick:bulletHit(_bulletDirection)
-    --print('_bulletDirection ',_bulletDirection)
+    if _bulletDirection == nil then
+        return 
+    end
     self.collisionCount = self.collisionCount + 1
     if self.collisionCount == 1 then
         self.stateCode = _bulletDirection + 1

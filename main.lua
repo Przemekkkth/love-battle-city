@@ -19,14 +19,10 @@ function love.load()
     Player2Data = {level = 0, boat = false, lives = 3}
 
     currentLevel = 0
-    isLeftHalfClicked = false
-    tiles = {}
-    holes = {}
+
     input = Input()
     timer = Timer()
-    audio = {}
-    audio.startSFX = love.audio.newSource('assets/sfx/startLevel.wav', 'static')
-    audio.startSFX:setVolume(0.0)
+    initAudio()
 
     input:bind('left', 'player1_left')
     input:bind('right', 'player1_right')
@@ -180,4 +176,24 @@ function love.keypressed(key)
     if key == "c" then
         --love.graphics.captureScreenshot(os.time() .. ".png") -- uncomment if you want to make screenshot
     end
+end
+
+function initAudio()
+    audio = {}
+    audio.startSFX = love.audio.newSource('assets/sfx/startLevel.wav', 'static')
+    audio.bonusSFX = love.audio.newSource('assets/sfx/bonus.wav', 'static')
+    audio.crashSFX = love.audio.newSource('assets/sfx/crash.wav', 'static')
+    audio.eagleSFX = love.audio.newSource('assets/sfx/eagle.wav', 'static')
+    audio.levelSFX = love.audio.newSource('assets/sfx/level.wav', 'static')
+    audio.lifeSFX = love.audio.newSource('assets/sfx/life.wav', 'static')
+    audio.shootSFX = love.audio.newSource('assets/sfx/shoot.wav', 'static')
+    
+    local volume = 0.5
+    audio.startSFX:setVolume(volume)
+    audio.bonusSFX:setVolume(volume)
+    audio.crashSFX:setVolume(volume)
+    audio.eagleSFX:setVolume(volume)
+    audio.levelSFX:setVolume(volume)
+    audio.lifeSFX:setVolume(volume)
+    audio.shootSFX:setVolume(volume - 0.25)
 end

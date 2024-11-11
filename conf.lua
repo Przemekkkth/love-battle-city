@@ -23,7 +23,7 @@ PlayerBulletMaxSize = 2
 EnemyStartCount = 20
 
 GameOverEntrySpeed = 0.13
-TankDefaultSpeed = 80
+TankDefaultSpeed = 100
 BulletDefaultSpeed = 200
 ShowEnemyTarget = false
 
